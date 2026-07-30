@@ -3,417 +3,1093 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SHASHWAT.SYS — Shashwat Saxena · Data Engineer</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
+<title>Shashwat Saxena — Data Engineer & XAI Researcher</title>
+<meta name="description" content="Data Engineer & PhD scholar in Explainable AI. I build streaming platforms, lakehouses and RAG pipelines that are transparent enough to bet real decisions on.">
+<meta property="og:title" content="Shashwat Saxena — Data Engineer & XAI Researcher">
+<meta property="og:description" content="Building pipelines people can trust. Streaming, lakehouses, RAG — and the research to make them explainable.">
+<meta property="og:image" content="og.png">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+<script src="three.min.js"></script>
+<style>
+  :root {
+    --bg: #06060a;
+    --ink: #f2f2f7;
+    --muted: #8a8a99;
+    --accent: #7c6cff;
+    --accent-2: #4dd6c1;
+    --pink: #ff6ec7;
+    --line: rgba(255,255,255,.08);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    overflow-x: hidden;
+  }
+  ::selection { background: var(--accent); color: #fff; }
+  @media (pointer: fine) { body, body a, body .card { cursor: none; } }
+
+  /* ===== Custom cursor ===== */
+  .cursor-dot, .cursor-ring {
+    position: fixed; top: 0; left: 0; border-radius: 50%; pointer-events: none; z-index: 2000;
+    transform: translate(-50%,-50%);
+  }
+  .cursor-dot { width: 8px; height: 8px; background: var(--ink); }
+  .cursor-ring {
+    width: 38px; height: 38px; border: 1.5px solid rgba(242,242,247,.5);
+    transition: width .3s, height .3s, border-color .3s, background .3s;
+  }
+  .cursor-ring.hot {
+    width: 64px; height: 64px; border-color: var(--accent);
+    background: rgba(124,108,255,.12);
+  }
+  @media (pointer: coarse) { .cursor-dot, .cursor-ring { display: none; } }
+
+  /* ===== Click ripple ===== */
+  .click-ripple {
+    position: fixed; border: 2px solid rgba(124,108,255,.75); border-radius: 50%;
+    pointer-events: none; z-index: 1500; transform: translate(-50%,-50%);
+    animation: rip .7s ease-out forwards;
+  }
+  @keyframes rip {
+    from { width: 10px; height: 10px; opacity: 1; }
+    to { width: 190px; height: 190px; opacity: 0; }
+  }
+
+  /* ===== Grain ===== */
+  .grain {
+    position: fixed; inset: 0; z-index: 300; pointer-events: none; opacity: .05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ===== Preloader ===== */
+  #preloader {
+    position: fixed; inset: 0; z-index: 1000; background: #040407;
+    display: flex; align-items: flex-end; justify-content: space-between;
+    padding: 40px 48px;
+    transition: transform 1s cubic-bezier(.76,0,.24,1);
+  }
+  #preloader.done { transform: translateY(-100%); }
+  #preloader .pl-name { font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); }
+  #preloader .pl-bar {
+    position: absolute; left: 0; bottom: 0; height: 3px; width: 0%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    transition: width .2s ease;
+  }
+  #preloader .pl-count {
+    font-size: clamp(80px, 16vw, 200px); font-weight: 800; letter-spacing: -6px; line-height: .85;
+    background: linear-gradient(100deg, var(--ink), var(--accent));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+
+  #gl { position: fixed; inset: 0; z-index: 0; display: block; }
+  .content { position: relative; z-index: 1; }
+
+  /* ===== Nav ===== */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 22px 48px;
+    backdrop-filter: blur(14px);
+    background: linear-gradient(rgba(6,6,10,.6), rgba(6,6,10,.15));
+    border-bottom: 1px solid var(--line);
+    transform: translateY(-100%); transition: transform .9s cubic-bezier(.16,1,.3,1) .9s;
+  }
+  body.loaded nav { transform: translateY(0); }
+  .logo { font-weight: 800; letter-spacing: -.5px; font-size: 18px; }
+  .logo span { color: var(--accent); }
+  .nav-links { display: flex; gap: 34px; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 14px; letter-spacing: .3px; transition: color .25s; }
+  .nav-links a:hover { color: var(--ink); }
+  .nav-cta {
+    padding: 10px 22px; border-radius: 100px; font-size: 14px; font-weight: 600;
+    color: #0a0a12; background: var(--ink); text-decoration: none; transition: box-shadow .25s;
+    will-change: transform;
+  }
+  .nav-cta:hover { box-shadow: 0 8px 30px rgba(124,108,255,.35); }
+
+  /* ===== Hero ===== */
+  .hero {
+    min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
+    padding: 140px 48px 80px; position: relative;
+  }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 13px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--accent-2);
+    margin-bottom: 28px; opacity: 0; transition: opacity 1s ease 1.1s;
+  }
+  body.loaded .eyebrow { opacity: 1; }
+  .eyebrow::before { content: ""; width: 34px; height: 1px; background: var(--accent-2); }
+  h1 { font-size: clamp(52px, 9vw, 128px); line-height: .98; letter-spacing: -4px; font-weight: 800; }
+  h1 .line { display: block; overflow: hidden; }
+  h1 .line > span {
+    display: inline-block; transform: translateY(115%);
+    transition: transform 1.1s cubic-bezier(.16,1,.3,1);
+  }
+  body.loaded h1 .line:nth-child(1) > span { transform: translateY(0); transition-delay: .95s; }
+  body.loaded h1 .line:nth-child(2) > span { transform: translateY(0); transition-delay: 1.1s; }
+  h1 .stroke { color: transparent; -webkit-text-stroke: 1.5px rgba(242,242,247,.55); }
+  h1 .grad {
+    background: linear-gradient(100deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .hero p {
+    max-width: 560px; margin-top: 32px; color: var(--muted); font-size: 19px; line-height: 1.7;
+    opacity: 0; transform: translateY(24px); transition: opacity 1s ease 1.35s, transform 1s ease 1.35s;
+  }
+  body.loaded .hero p { opacity: 1; transform: translateY(0); }
+  .hero-row {
+    display: flex; gap: 18px; margin-top: 44px;
+    opacity: 0; transform: translateY(24px); transition: opacity 1s ease 1.5s, transform 1s ease 1.5s;
+  }
+  body.loaded .hero-row { opacity: 1; transform: translateY(0); }
+  body.settle nav { transform: none !important; }
+  body.settle h1 .line > span { transform: none !important; transition: none !important; }
+  body.settle .eyebrow, body.settle .hero p, body.settle .hero-row { opacity: 1 !important; transform: none !important; }
+
+  .btn-primary {
+    padding: 16px 36px; border-radius: 100px; background: linear-gradient(100deg, var(--accent), #a08bff);
+    color: #fff; font-weight: 700; text-decoration: none; font-size: 15px;
+    transition: box-shadow .25s; will-change: transform; display: inline-block;
+  }
+  .btn-primary:hover { box-shadow: 0 14px 40px rgba(124,108,255,.45); }
+  .btn-ghost {
+    padding: 16px 36px; border-radius: 100px; border: 1px solid var(--line); color: var(--ink);
+    text-decoration: none; font-size: 15px; font-weight: 600; transition: border-color .25s, background .25s;
+    backdrop-filter: blur(6px); will-change: transform; display: inline-block;
+  }
+  .btn-ghost:hover { border-color: var(--accent); background: rgba(124,108,255,.08); }
+  .scroll-hint {
+    position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
+    color: var(--muted); font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+    animation: bob 2.2s ease-in-out infinite; white-space: nowrap;
+  }
+  @keyframes bob { 0%,100% { transform: translate(-50%,0); } 50% { transform: translate(-50%,10px); } }
+
+  /* ===== Morph stage dots ===== */
+  .stage-hint {
+    position: fixed; right: 28px; top: 50%; transform: translateY(-50%); z-index: 90;
+    display: flex; flex-direction: column; gap: 14px; align-items: center;
+  }
+  .stage-hint .dot {
+    width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.18);
+    transition: background .4s, transform .4s;
+  }
+  .stage-hint .dot.on { background: var(--accent); transform: scale(1.5); }
+  @media (max-width: 860px) { .stage-hint { display: none; } }
+
+  /* ===== Marquee ===== */
+  .marquee {
+    border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+    overflow: hidden; padding: 26px 0; white-space: nowrap;
+    background: rgba(12,12,20,.7); backdrop-filter: blur(8px);
+  }
+  .marquee-track { display: inline-block; animation: scroll 26s linear infinite; }
+  .marquee span { font-size: 22px; font-weight: 700; letter-spacing: 1px; margin: 0 34px; color: var(--muted); }
+  .marquee span b { color: var(--accent-2); font-weight: 700; }
+  @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* ===== Sections ===== */
+  section { padding: 150px 48px; max-width: 1200px; margin: 0 auto; position: relative; }
+  .watermark {
+    position: absolute; top: 40px; right: 0; font-size: clamp(90px, 16vw, 220px);
+    font-weight: 800; letter-spacing: -8px; line-height: 1; pointer-events: none;
+    color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,.05); user-select: none;
+  }
+  .section-tag { font-size: 13px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--accent); margin-bottom: 18px; }
+  h2 { font-size: clamp(34px, 5vw, 58px); letter-spacing: -2px; font-weight: 800; margin-bottom: 60px; }
+
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; perspective: 1200px; }
+  .stat {
+    padding: 36px 28px; border: 1px solid var(--line); border-radius: 20px;
+    background: rgba(12,12,20,.55); backdrop-filter: blur(10px);
+    transition: transform .3s, border-color .3s;
+    opacity: 0;
+  }
+  .stat:hover { transform: translateY(-6px); border-color: rgba(124,108,255,.5); }
+  .stat .num {
+    font-size: 46px; font-weight: 800; letter-spacing: -2px;
+    background: linear-gradient(100deg, var(--ink), var(--accent));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .stat .label { color: var(--muted); font-size: 14px; margin-top: 10px; line-height: 1.5; }
+
+  .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 26px; perspective: 1400px; }
+  .card {
+    position: relative; border: 1px solid var(--line); border-radius: 24px; padding: 42px;
+    background: rgba(12,12,20,.6); backdrop-filter: blur(10px);
+    overflow: hidden; transition: border-color .35s;
+    transform-style: preserve-3d; will-change: transform;
+    opacity: 0;
+  }
+
+  /* ===== Swirl-in entrance (reel style): fly in around center, overshoot, settle ===== */
+  @keyframes cardFly {
+    0% {
+      opacity: 0;
+      transform: translate3d(var(--fx), var(--fy), -320px) rotate3d(.25, 1, .08, var(--fr)) scale(.5);
+    }
+    55% { opacity: 1; }
+    76% {
+      transform: translate3d(calc(var(--fx) * -.055), calc(var(--fy) * -.055), 24px)
+                 rotate3d(.25, 1, .08, calc(var(--fr) * -.14)) scale(1.025);
+    }
+    100% {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) rotate3d(.25, 1, .08, 0deg) scale(1);
+    }
+  }
+  .cards.go .card, .stats.go .stat {
+    opacity: 1;
+    animation: cardFly 1.1s cubic-bezier(.22, 1, .36, 1) backwards;
+  }
+  .cards .card:nth-child(1) { --fx: 46vw;  --fy: 16vh;  --fr: -70deg; animation-delay: 0s; }
+  .cards .card:nth-child(2) { --fx: -46vw; --fy: 22vh;  --fr: 70deg;  animation-delay: .13s; }
+  .cards .card:nth-child(3) { --fx: 40vw;  --fy: -12vh; --fr: -55deg; animation-delay: .26s; }
+  .cards .card:nth-child(4) { --fx: -40vw; --fy: -18vh; --fr: 55deg;  animation-delay: .39s; }
+  .stats .stat:nth-child(1) { --fx: 34vw;  --fy: 10vh;  --fr: -50deg; animation-delay: 0s; }
+  .stats .stat:nth-child(2) { --fx: -30vw; --fy: 14vh;  --fr: 50deg;  animation-delay: .11s; }
+  .stats .stat:nth-child(3) { --fx: 28vw;  --fy: -9vh;  --fr: -42deg; animation-delay: .22s; }
+  .stats .stat:nth-child(4) { --fx: -34vw; --fy: -12vh; --fr: 42deg;  animation-delay: .33s; }
+  body.settle .card, body.settle .stat { animation-duration: .9s; }
+  @media (prefers-reduced-motion: reduce) {
+    .cards.go .card, .stats.go .stat { animation: none; opacity: 1; }
+  }
+  .card::before {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(600px circle at var(--mx, 50%) var(--my, 50%), rgba(124,108,255,.14), transparent 45%);
+    opacity: 0; transition: opacity .35s;
+  }
+  .card:hover::before { opacity: 1; }
+  .card:hover { border-color: rgba(124,108,255,.4); }
+  .card .idx { font-size: 13px; color: var(--accent-2); letter-spacing: 2px; }
+  .card h3 { font-size: 26px; letter-spacing: -.8px; margin: 16px 0 14px; }
+  .card p { color: var(--muted); line-height: 1.7; font-size: 15px; }
+  .card .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+  .card .tags span { font-size: 12px; padding: 6px 14px; border-radius: 100px; border: 1px solid var(--line); color: var(--muted); }
+  .card .arrow {
+    position: absolute; top: 38px; right: 38px; font-size: 22px; color: var(--accent);
+    opacity: 0; transform: translate(-8px, 8px); transition: opacity .3s, transform .3s;
+  }
+  .card:hover .arrow { opacity: 1; transform: translate(0,0); }
+
+  .reveal { opacity: 0; transform: translateY(50px); transition: opacity .8s ease, transform .8s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  .cta-wrap { text-align: center; padding: 170px 48px 150px; position: relative; }
+  .cta-wrap h2 { margin-bottom: 26px; }
+  .cta-wrap p { color: var(--muted); max-width: 480px; margin: 0 auto 44px; line-height: 1.7; }
+  .socials { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 38px; }
+  .socials a {
+    padding: 11px 22px; border: 1px solid var(--line); border-radius: 100px;
+    color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 600;
+    transition: color .25s, border-color .25s, background .25s;
+  }
+  .socials a:hover { color: var(--ink); border-color: var(--accent); background: rgba(124,108,255,.08); }
+
+  footer {
+    border-top: 1px solid var(--line); padding: 34px 48px; display: flex;
+    justify-content: space-between; color: var(--muted); font-size: 13px;
+    background: rgba(6,6,10,.7);
+  }
+
+  @media (max-width: 860px) {
+    .nav-links { display: none; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .cards { grid-template-columns: 1fr; }
+    .watermark { display: none; }
+  }
+</style>
 </head>
 <body>
 
-<!-- ambient -->
-<canvas id="field"></canvas>
-<div class="grid-bg"></div>
-<div class="glow"></div>
-<div class="vign"></div>
-<div class="scan"></div>
-
-<!-- boot -->
-<div id="boot">
-  <div class="boot-inner">
-    <div class="boot-frame bracket">
-      <div id="bootlog"></div>
-      <div class="boot-bartrack"><div id="bootbar"></div></div>
-    </div>
-  </div>
-  <button id="bootskip">Skip intro ⏎</button>
+<div id="preloader">
+  <div class="pl-name">shashwat.dev — portfolio '26</div>
+  <div class="pl-count" id="plcount">0</div>
+  <div class="pl-bar" id="plbar"></div>
 </div>
 
-<!-- top HUD -->
-<div class="hud-top">
-  <div class="grp">
-    <span>SHASHWAT.SYS</span>
-    <span class="hide-sm">REGION <b>PUNE · IN</b></span>
-    <span class="live"><i></i> ALL SYSTEMS NOMINAL</span>
-  </div>
-  <div class="grp">
-    <span class="hide-sm">SCROLL <b id="scrollpct">000</b>%</span>
-    <a href="assets/Shashwat_Saxena_Resume.pdf" download class="hud-cv">↓ RÉSUMÉ.PDF</a>
-    <span id="hud-clock">--:--:-- IST</span>
-  </div>
-</div>
+<canvas id="gl"></canvas>
+<div class="grain"></div>
+<div class="cursor-ring" id="cring"></div>
+<div class="cursor-dot" id="cdot"></div>
 
-<!-- nav -->
-<nav id="nav">
-  <div class="wrap nav-inner">
-    <a href="#hero" class="logo" data-mag="0.2"><span class="mk">◇</span>SHASHWAT.SYS</a>
-    <div class="nav-links" id="navLinks">
-      <a href="#about" class="navlink">About</a>
-      <a href="#work" class="navlink">Systems</a>
-      <a href="#stack" class="navlink">Stack</a>
-      <a href="#journey" class="navlink">Log</a>
-      <a href="#writing" class="navlink">Notes</a>
-      <a href="#research" class="navlink">R&amp;D</a>
-      <a href="#contact" class="navlink nav-cta">Connect</a>
-    </div>
-    <button class="nav-toggle" id="navToggle" aria-label="Menu">≡</button>
+<nav>
+  <div class="logo">shashwat<span>.</span>dev</div>
+  <div class="nav-links">
+    <a href="#work">Work</a>
+    <a href="#stats">Impact</a>
+    <a href="#contact">Contact</a>
   </div>
+  <a href="#contact" class="nav-cta magnetic">Let's talk</a>
 </nav>
 
-<!-- side rail -->
-<div id="rail">
-  <div class="rail-item" data-id="hero"><span class="t">Home</span><span class="n"></span></div>
-  <div class="rail-item" data-id="about"><span class="t">About</span><span class="n"></span></div>
-  <div class="rail-item" data-id="work"><span class="t">Systems</span><span class="n"></span></div>
-  <div class="rail-track"><div id="railfill"></div></div>
-  <div class="rail-item" data-id="stack"><span class="t">Stack</span><span class="n"></span></div>
-  <div class="rail-item" data-id="journey"><span class="t">Log</span><span class="n"></span></div>
-  <div class="rail-item" data-id="writing"><span class="t">Notes</span><span class="n"></span></div>
-  <div class="rail-item" data-id="research"><span class="t">R&amp;D</span><span class="n"></span></div>
-  <div class="rail-item" data-id="contact"><span class="t">Connect</span><span class="n"></span></div>
+<div class="stage-hint" id="stagehint">
+  <div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
 </div>
 
-<main>
+<div class="content">
 
-<!-- ===================== HERO ===================== -->
-<section id="hero" data-screen-label="Hero">
-  <div class="wrap">
-    <div class="hero-grid">
-      <div class="hero-left">
-        <span class="hero-tag reveal"><i></i> OPERATOR ONLINE · OPEN TO OPPORTUNITIES</span>
-        <h1 class="hero-name">
-          <span class="l1" data-scramble>SHASHWAT</span><br>
-          <span class="l2" data-scramble>SAXENA</span>
-        </h1>
-        <p class="hero-role"><span id="typed"></span><span class="cur">▍</span></p>
-        <p class="hero-desc reveal d2">5+ years architecting enterprise-scale data platforms, big-data pipelines and GenAI systems — turning raw data into intelligence that businesses trust.</p>
-        <div class="hero-actions reveal d3">
-          <a href="#work" class="btn btn-primary" data-mag="0.25">Deployed systems <span class="arrow">→</span></a>
-          <a href="assets/Shashwat_Saxena_Resume.pdf" download class="btn btn-ghost" data-mag="0.25">Download résumé <span class="arrow">↓</span></a>
-          <a href="#contact" class="btn btn-ghost" data-mag="0.25">Establish link <span class="arrow">↗</span></a>
-        </div>
-      </div>
-      <div class="hero-right reveal d2">
-        <div class="panel hud-card bracket" data-tilt>
-          <div class="hc-head"><span>// LIVE TELEMETRY</span><span class="live"><i></i> REC</span></div>
-          <div class="hc-rows">
-            <div class="hc-row"><span class="k">Records processed</span><span class="v" id="hud-records">4,820,374</span></div>
-            <div class="hc-row"><span class="k">Pipeline uptime</span><span class="v"><b data-count="99.9" data-dec="1" data-suffix="%">0%</b></span></div>
-            <div class="hc-row"><span class="k">Years in service</span><span class="v"><b data-count="5" data-suffix="+">0</b></span></div>
-            <div class="hc-row"><span class="k">Exec speedup</span><span class="v"><b data-count="10" data-suffix="×">0</b></span></div>
-            <div class="hc-row"><span class="k">Network reach</span><span class="v"><b data-count="11.5" data-dec="1" data-suffix="K">0</b></span></div>
-            <div class="hc-row"><span class="k">Clearance</span><span class="v">AWS · PCAP</span></div>
-          </div>
-        </div>
-      </div>
-    </div>
+<header class="hero">
+  <div class="eyebrow">Data Engineer · PhD Scholar — Explainable AI</div>
+  <h1>
+    <span class="line"><span>Building <span class="stroke">pipelines</span></span></span>
+    <span class="line"><span>people can <span class="grad">trust.</span></span></span>
+  </h1>
+  <p>I build large-scale data platforms by day — streaming systems, lakehouses, enterprise RAG — and research explainable AI by night, making ML systems transparent enough to bet real decisions on. Scroll — the particles will follow.</p>
+  <div class="hero-row">
+    <a href="#work" class="btn-primary magnetic">View my work</a>
+    <a href="#contact" class="btn-ghost magnetic">Get in touch</a>
   </div>
-  <div class="hero-scroll">SCROLL TO BOOT ↓</div>
+  <div class="scroll-hint">Scroll · click the void</div>
+</header>
+
+<div class="marquee">
+  <div class="marquee-track" id="marquee">
+    <span>PySpark <b>·</b></span><span>Kafka <b>·</b></span><span>Databricks <b>·</b></span>
+    <span>Airflow <b>·</b></span><span>Snowflake <b>·</b></span><span>dbt <b>·</b></span>
+    <span>AWS <b>·</b></span><span>Azure <b>·</b></span><span>Delta Lake <b>·</b></span>
+    <span>LangChain <b>·</b></span><span>SHAP <b>·</b></span><span>Terraform <b>·</b></span>
+  </div>
+</div>
+
+<section id="stats">
+  <div class="watermark">IMPACT</div>
+  <div class="section-tag reveal">Impact</div>
+  <h2 class="reveal">Numbers that ship.</h2>
+  <div class="stats">
+    <div class="stat"><div class="num" data-count="5" data-suffix="+">0</div><div class="label">Years building data platforms across fintech & banking</div></div>
+    <div class="stat"><div class="num" data-count="5" data-suffix="M+">0</div><div class="label">Records flowing daily through pipelines I engineered</div></div>
+    <div class="stat"><div class="num" data-count="99" data-suffix=".9%">0</div><div class="label">Uptime on real-time streaming monitoring I built</div></div>
+    <div class="stat"><div class="num" data-count="15" data-suffix="+">0</div><div class="label">Production pipelines shipped end-to-end</div></div>
+  </div>
 </section>
 
-<!-- ===================== ABOUT ===================== -->
-<section id="about" data-screen-label="About">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="kicker"><span class="idx">01</span> Operator profile</span>
-      <h2 class="sec-title" data-scramble>The engineer behind the pipelines.</h2>
+<section id="work">
+  <div class="watermark">WORK</div>
+  <div class="section-tag reveal">Selected work</div>
+  <h2 class="reveal">Things I've built.</h2>
+  <div class="cards">
+    <div class="card" data-href="https://www.linkedin.com/in/saxena-shashwat">
+      <div class="arrow">↗</div>
+      <div class="idx">01</div>
+      <h3>Enterprise RAG for Financial Docs</h3>
+      <p>A retrieval-augmented pipeline for financial document summarization — LangChain + vector databases wired into governed banking data flows, cutting manual review effort by 40%.</p>
+      <div class="tags"><span>LangChain</span><span>Vector DBs</span><span>LLMOps</span></div>
     </div>
-    <div class="about-grid">
-      <div class="panel id-card bracket reveal">
-        <div class="id-photo">
-          <img src="assets/portrait.png" alt="Shashwat Saxena">
-          <div class="id-frame"><span class="rec"><i></i> REC</span><span>ID · 4827</span></div>
-        </div>
-        <div class="id-meta">
-          <div class="row"><span>NAME</span><b>Shashwat Saxena</b></div>
-          <div class="row"><span>ROLE</span><b>Data Engineer · IBM</b></div>
-          <div class="row"><span>BASE</span><b>Pune, India</b></div>
-          <div class="row"><span>STATUS</span><b>Open to work</b></div>
-        </div>
-      </div>
-      <div class="about-copy reveal d1">
-        <p><strong>“I build data pipelines that don't break.”</strong> Over <strong class="c">5+ years</strong> I've gone from writing basic SQL to architecting enterprise-scale Cloud Data Lakes and deploying RAG pipelines that process millions of records daily.</p>
-        <p>Currently at <strong>IBM</strong> I optimize ETL workflows and build Generative AI architectures that save 200+ hours of manual effort annually. Before that, 3.5 years at Pine Labs leading the migration of legacy workloads to <strong class="c">Azure Databricks</strong> — a 10× execution-time reduction across 15+ production pipelines.</p>
-        <p>In parallel I'm pursuing a <strong class="c">Ph.D. at VIT in Trustworthy &amp; Explainable AI</strong> — making LLMs transparent, bias-aware and ethically compliant for enterprise data systems.</p>
-        <div class="endorse">
-          <p>“Deep expertise in designing and managing scalable data architectures… troubleshoots complex issues and delivers innovative solutions — a key asset to any team.”</p>
-          <div class="by">— <b>Utkarsha Raiker</b> · Software Engineer, Bank of America</div>
-        </div>
-        <div class="gauges">
-          <div class="gauge"><div class="num" data-count="5" data-suffix="+">0</div><div class="lbl">Years shipping</div></div>
-          <div class="gauge"><div class="num"><span data-count="99.9" data-dec="1">0</span><span class="u">%</span></div><div class="lbl">System uptime</div></div>
-          <div class="gauge"><div class="num"><span data-count="10">0</span><span class="u">×</span></div><div class="lbl">Faster execution</div></div>
-          <div class="gauge"><div class="num"><span data-count="5">0</span><span class="u">M+</span></div><div class="lbl">Records / day</div></div>
-        </div>
-      </div>
+    <div class="card" data-href="https://www.linkedin.com/in/saxena-shashwat">
+      <div class="arrow">↗</div>
+      <div class="idx">02</div>
+      <h3>10x Lakehouse Migration</h3>
+      <p>Moved RDBMS workloads to an Azure Databricks lakehouse — PySpark pipelines over 5M+ daily records running 10x faster, plus a 100GB+ Synapse warehouse consolidating 10+ vendor feeds.</p>
+      <div class="tags"><span>Databricks</span><span>PySpark</span><span>Azure Synapse</span></div>
+    </div>
+    <div class="card" data-href="https://github.com/shashwatsaxena571">
+      <div class="arrow">↗</div>
+      <div class="idx">03</div>
+      <h3>ExplainOps — Open Source</h3>
+      <p>An ops layer for ML explanations: lineage-linked attribution tracing, drift monitoring, and trust checks. Part of an XAI × Data Engineering series I'm shipping repo by repo on GitHub.</p>
+      <div class="tags"><span>XAI</span><span>Open Source</span><span>Python</span></div>
+    </div>
+    <div class="card">
+      <div class="arrow">↗</div>
+      <div class="idx">04</div>
+      <h3>Trustworthy AI Research</h3>
+      <p>Survey of Trustworthy & Explainable AI accepted at IEEE WorldSUAS 2026 — alongside PhD research on making LLM systems transparent, bias-aware, and auditable in enterprise data platforms.</p>
+      <div class="tags"><span>IEEE 2026</span><span>PhD</span><span>XAI</span></div>
     </div>
   </div>
 </section>
 
-<!-- ===================== WORK ===================== -->
-<section id="work" data-screen-label="Systems">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="kicker"><span class="idx">02</span> Deployed systems</span>
-      <h2 class="sec-title" data-scramble>Pipelines in production.</h2>
-      <p class="sec-sub">Engineering outcomes measured in cost, speed and reliability — across financial services, fintech and analytics.</p>
-    </div>
-    <div class="work-list reveal">
-      <article class="work-row" data-tilt>
-        <div class="wr-id">SYS-01</div>
-        <div class="wr-main">
-          <h3>Financial Document RAG Pipeline <span class="go">↗</span></h3>
-          <p>Scalable Retrieval-Augmented Generation pipeline automating complex financial document summarization — built with LangChain, vector databases and the OpenAI API.</p>
-          <div class="wr-tags"><span class="tag">LangChain</span><span class="tag">Vector DB</span><span class="tag">OpenAI</span><span class="tag">RAG</span></div>
-        </div>
-        <div class="wr-meta">
-          <div class="wr-metric">−40%<span class="ml">review time</span></div>
-          <div class="wr-where">IBM · Barclays · 2024→</div>
-        </div>
-      </article>
-      <article class="work-row" data-tilt>
-        <div class="wr-id">SYS-02</div>
-        <div class="wr-main">
-          <h3>Real-time Streaming &amp; Monitoring <span class="go">↗</span></h3>
-          <p>Robust streaming and observability architecture with Kafka and PySpark — boosting pipeline reliability and holding five-nines availability.</p>
-          <div class="wr-tags"><span class="tag">Apache Kafka</span><span class="tag">PySpark</span><span class="tag">Grafana</span></div>
-        </div>
-        <div class="wr-meta">
-          <div class="wr-metric">99.9%<span class="ml">uptime</span></div>
-          <div class="wr-where">IBM · 2024→</div>
-        </div>
-      </article>
-      <article class="work-row" data-tilt>
-        <div class="wr-id">SYS-03</div>
-        <div class="wr-main">
-          <h3>Cloud Data Lake Migration <span class="go">↗</span></h3>
-          <p>Led migration of legacy workloads from RDBMS to a modern Data Lake on Azure Databricks, processing 5M+ daily records with a dramatic execution-time reduction.</p>
-          <div class="wr-tags"><span class="tag">Azure Databricks</span><span class="tag">PySpark</span><span class="tag">HDFS</span></div>
-        </div>
-        <div class="wr-meta">
-          <div class="wr-metric">10×<span class="ml">faster</span></div>
-          <div class="wr-where">Pine Labs · 2021–24</div>
-        </div>
-      </article>
-      <article class="work-row" data-tilt>
-        <div class="wr-id">SYS-04</div>
-        <div class="wr-main">
-          <h3>Enterprise Data Warehouse <span class="go">↗</span></h3>
-          <p>Designed and deployed a 100GB+ enterprise warehouse for an airline client on Azure Synapse, consolidating feeds from 10+ distinct vendors.</p>
-          <div class="wr-tags"><span class="tag">Azure Synapse</span><span class="tag">Data Factory</span><span class="tag">SQL Server</span></div>
-        </div>
-        <div class="wr-meta">
-          <div class="wr-metric">100GB+<span class="ml">consolidated</span></div>
-          <div class="wr-where">Pine Labs · 2021–24</div>
-        </div>
-      </article>
-    </div>
+<div class="cta-wrap" id="contact">
+  <div class="section-tag reveal">Contact</div>
+  <h2 class="reveal">Let's build something<br>worth trusting.</h2>
+  <p class="reveal">Open to collaborations in data engineering, explainable AI research, and technical content. The particles just spelled my name — now you know who to email.</p>
+  <a href="mailto:shashwatsaxena171@gmail.com" class="btn-primary magnetic reveal">shashwatsaxena171@gmail.com</a>
+  <div class="socials reveal">
+    <a href="https://www.linkedin.com/in/saxena-shashwat" target="_blank" rel="noopener">LinkedIn</a>
+    <a href="https://github.com/shashwatsaxena571" target="_blank" rel="noopener">GitHub</a>
+    <a href="https://x.com/I_m_Shash" target="_blank" rel="noopener">X</a>
+    <a href="https://www.youtube.com/@ByteSparkInsights" target="_blank" rel="noopener">YouTube</a>
+    <a href="https://www.instagram.com/pipeline.diaries" target="_blank" rel="noopener">Instagram</a>
+    <a href="https://www.linkedin.com/newsletters/7488207829871304704/" target="_blank" rel="noopener">Newsletter</a>
   </div>
-</section>
-
-<!-- ===================== IMPACT ===================== -->
-<section id="impact" data-screen-label="Impact" class="impact-sec">
-  <div class="wrap">
-    <div class="impact-head reveal">
-      <span class="kicker"><span class="idx">//</span> Aggregate telemetry</span>
-      <p class="impact-line">Five years of shipping — measured in cost, speed and reliability.</p>
-    </div>
-    <div class="impact-stats">
-      <div class="ist reveal">
-        <div class="ist-n"><b data-count="25" data-prefix="−" data-suffix="%">0</b></div>
-        <div class="ist-l">Operational cost</div>
-        <div class="ist-d">AWS Glue ETL re-architecture</div>
-      </div>
-      <div class="ist reveal d1">
-        <div class="ist-n"><b data-count="200" data-suffix="+">0</b></div>
-        <div class="ist-l">Compute hrs saved / yr</div>
-        <div class="ist-d">PySpark refactor · +25% speed</div>
-      </div>
-      <div class="ist reveal d2">
-        <div class="ist-n"><b data-count="40" data-prefix="−" data-suffix="%">0</b></div>
-        <div class="ist-l">Document review time</div>
-        <div class="ist-d">GenAI RAG pipeline · LangChain</div>
-      </div>
-      <div class="ist reveal d3">
-        <div class="ist-n"><b data-count="15" data-suffix="+">0</b></div>
-        <div class="ist-l">Production pipelines</div>
-        <div class="ist-d">Shipped with zero downtime</div>
-      </div>
-    </div>
-  </div>
-</section>
-<section id="stack" data-screen-label="Stack">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="kicker"><span class="idx">03</span> Tech matrix</span>
-      <h2 class="sec-title" data-scramble>The toolchain.</h2>
-    </div>
-    <div class="matrix reveal">
-      <div class="mcell"><h4><span class="mi">//</span> Big Data</h4><div class="chiplist"><span class="chip">PySpark</span><span class="chip">Kafka</span><span class="chip">Databricks</span><span class="chip">Iceberg</span><span class="chip">dbt</span><span class="chip">Hadoop / HDFS</span><span class="chip">Hive</span></div></div>
-      <div class="mcell"><h4><span class="mi">//</span> Cloud</h4><div class="chiplist"><span class="chip">AWS S3 · EMR</span><span class="chip">Redshift</span><span class="chip">Glue · Athena</span><span class="chip">Lambda</span><span class="chip">Azure ADF</span><span class="chip">Synapse</span></div></div>
-      <div class="mcell"><h4><span class="mi">//</span> Data &amp; Warehouse</h4><div class="chiplist"><span class="chip">Snowflake</span><span class="chip">SQL / NoSQL</span><span class="chip">Oracle</span><span class="chip">MongoDB</span><span class="chip">SQL Server</span><span class="chip">MySQL</span></div></div>
-      <div class="mcell"><h4><span class="mi">//</span> GenAI &amp; Applied AI</h4><div class="chiplist"><span class="chip">Generative AI</span><span class="chip">RAG</span><span class="chip">Vector DBs</span><span class="chip">Prompt Eng</span><span class="chip">LLMOps</span></div></div>
-      <div class="mcell"><h4><span class="mi">//</span> Orchestration</h4><div class="chiplist"><span class="chip">Airflow</span><span class="chip">CloudWatch</span><span class="chip">Grafana</span><span class="chip">Prometheus</span></div></div>
-      <div class="mcell"><h4><span class="mi">//</span> DevOps &amp; CI/CD</h4><div class="chiplist"><span class="chip">Terraform</span><span class="chip">Docker</span><span class="chip">Kubernetes</span><span class="chip">Jenkins</span><span class="chip">Git</span><span class="chip">Linux</span></div></div>
-    </div>
-  </div>
-</section>
-
-<!-- ===================== JOURNEY ===================== -->
-<section id="journey" data-screen-label="Log">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="kicker"><span class="idx">04</span> Mission log</span>
-      <h2 class="sec-title" data-scramble>Experience &amp; education.</h2>
-    </div>
-    <div class="journey-grid">
-      <div class="jcol">
-        <h3 class="jcol-head reveal"><span class="ji">//</span> Experience</h3>
-        <div class="timeline">
-          <div class="tl-item reveal">
-            <div class="tl-when">07/2024 — PRESENT · 2 YRS</div>
-            <h4>Data Engineer</h4>
-            <div class="tl-where">IBM · Client: Barclays · Pune</div>
-            <p>Engineered ETL workflows on AWS Glue (25% cost reduction), refactored PySpark for 25% faster processing, architected Kafka streaming at 99.9% uptime, and deployed a RAG pipeline for financial systems that cut document review time by 40%.</p>
-          </div>
-          <div class="tl-item reveal d1">
-            <div class="tl-when">02/2021 — 07/2024 · 3 YRS 6 MOS</div>
-            <h4>Software Engineer</h4>
-            <div class="tl-where">Pine Labs · Bengaluru, India</div>
-            <p>Led 15+ production data pipelines with zero downtime, spearheaded the RDBMS → Data Lake migration on Azure Databricks (10× faster execution on 5M+ daily records), and built a 100GB+ enterprise warehouse on Azure Synapse consolidating 10+ vendor feeds.</p>
-          </div>
-          <div class="tl-item reveal d2">
-            <div class="tl-when">10/2020 — 01/2021</div>
-            <h4>Data Analyst Intern</h4>
-            <div class="tl-where">Nuvoretail Enlytical Technologies</div>
-            <p>Optimized the online billing system for a 50% speed &amp; security gain, and deployed 8+ statistical forecasting models at 90% prediction accuracy.</p>
-          </div>
-        </div>
-      </div>
-      <div class="jcol">
-        <h3 class="jcol-head reveal"><span class="ji">//</span> Education</h3>
-        <div class="timeline">
-          <div class="tl-item reveal">
-            <div class="tl-when">PURSUING · EXPECTED 2029</div>
-            <h4>Ph.D. Scholar — Trustworthy &amp; Explainable AI</h4>
-            <div class="tl-where">Vellore Institute of Technology (VIT)</div>
-            <p>Architecting methodologies to make LLMs transparent, bias-free and ethically compliant for enterprise-scale data systems — XAI, bias detection &amp; mitigation.</p>
-          </div>
-          <div class="tl-item reveal d1">
-            <div class="tl-when">07/2019 — 07/2021 · 8.91 / 10</div>
-            <h4>Master of Computer Application (MCA)</h4>
-            <div class="tl-where">Vellore Institute of Technology (VIT)</div>
-            <p>Graduated with an 8.91/10 CGPA — foundations in data structures, algorithms, system design and applied machine learning.</p>
-          </div>
-          <div class="tl-item reveal d2">
-            <div class="tl-when">08/2015 — 07/2018 · 65%</div>
-            <h4>Bachelor of Computer Application (BCA)</h4>
-            <div class="tl-where">M. J. P. Rohilkhand University</div>
-            <p>Core computer-science fundamentals — programming, databases and software engineering principles.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===================== WRITING ===================== -->
-<section id="writing" data-screen-label="Notes">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="kicker"><span class="idx">05</span> Field notes</span>
-      <h2 class="sec-title" data-scramble>Writing on data &amp; AI.</h2>
-      <p class="sec-sub">I write about PySpark, modern data stacks and building enterprise LLMs. A few signals from the feed.</p>
-    </div>
-    <div class="notes reveal">
-      <article class="panel note bracket" data-tilt>
-        <div class="nmeta"><span class="topic">Reality check</span><span>903 impressions</span></div>
-        <h3>80% of "AI/ML" is actually Data Engineering.</h3>
-        <p>Everyone talks algorithms. Few talk broken CSVs, schema drift at 3 AM, and the cleaning that happens before a model learns anything. No pipeline, no prediction.</p>
-        <div class="nfoot">Read on LinkedIn →</div>
-      </article>
-      <article class="panel note bracket" data-tilt>
-        <div class="nmeta"><span class="topic">Architecture</span><span>1,239 impressions</span></div>
-        <h3>Data engineering isn't just pipelines — it's product design.</h3>
-        <p>What if we treat data like a product? Usability for analysts, scalability under growth, and an experience simple enough for someone new to understand.</p>
-        <div class="nfoot">Read on LinkedIn →</div>
-      </article>
-      <article class="panel note bracket" data-tilt>
-        <div class="nmeta"><span class="topic">Research</span><span>XAI</span></div>
-        <h3>Engineer by day, Explainable-AI researcher by night.</h3>
-        <p>We deploy LLMs in banking, healthcare and legal. If we can't explain why a model made a decision, we have no business shipping it. That's the gap I research.</p>
-        <div class="nfoot">Read on LinkedIn →</div>
-      </article>
-    </div>
-  </div>
-</section>
-
-<!-- ===================== RESEARCH ===================== -->
-<section id="research" data-screen-label="R&D">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="kicker"><span class="idx">06</span> R&amp;D · credentials</span>
-      <h2 class="sec-title" data-scramble>Where I'm pushing.</h2>
-    </div>
-    <div class="rd-grid">
-      <article class="panel rd-card bracket reveal">
-        <div class="rd-tag"><span>XAI</span><span class="muted">PH.D RESEARCH</span></div>
-        <h3>Transparent &amp; bias-free LLMs</h3>
-        <p>Architecting methodologies to make large language models explainable and ethically compliant for enterprise-scale data systems.</p>
-        <div class="rd-foot">VIT · Expected 2029 →</div>
-      </article>
-      <article class="panel rd-card bracket reveal d1">
-        <div class="rd-tag"><span>AWS</span><span class="muted">CERTIFIED</span></div>
-        <h3>AWS Certified Data Engineer — Associate</h3>
-        <p>Validated expertise designing, building and operationalizing data pipelines on AWS.</p>
-        <div class="rd-foot">Credential verified →</div>
-      </article>
-      <article class="panel rd-card bracket reveal d2">
-        <div class="rd-tag"><span>PYTHON</span><span class="muted">CERTIFIED</span></div>
-        <h3>PCAP™ — Associate Python Programmer</h3>
-        <p>One of 22 certifications spanning Big Data, cloud and AI — including TrendyTech Big Data Engineer.</p>
-        <div class="rd-foot">22 credentials total →</div>
-      </article>
-    </div>
-    <div class="creds reveal d1">
-      <div class="cred"><span class="ct">Publication</span><span class="cm">Smart traffic management system for prioritizing emergency vehicles (WSN)</span><span class="cy">NCSET · 2020</span></div>
-      <div class="cred"><span class="ct">Publication</span><span class="cm">Wireless Sensor Network problem implementation</span><span class="cy">NCSET · 2019</span></div>
-      <div class="cred"><span class="ct">Honor</span><span class="cm">Facebook · Udacity PyTorch Scholarship</span><span class="cy">2020</span></div>
-      <div class="cred"><span class="ct">Certification</span><span class="cm">Big Data Engineer — TrendyTech (Sumit Mittal)</span><span class="cy">2023</span></div>
-    </div>
-  </div>
-</section>
-
-<!-- ===================== CONTACT ===================== -->
-<section id="contact" data-screen-label="Connect">
-  <div class="wrap">
-    <div class="panel bracket reveal">
-      <span class="kicker" style="justify-content:center;"><span class="idx">07</span> Establish connection</span>
-      <h2 class="contact-title" style="margin-top:20px;">Let's build something<br><span class="grad">scalable.</span></h2>
-      <p class="contact-sub">A data platform to modernize, a pipeline to tame, or a role in mind? Channel's open — based in Pune, working globally.</p>
-      <a href="mailto:shashwatsaxena115@gmail.com" class="btn btn-primary" data-mag="0.25">shashwatsaxena115@gmail.com <span class="arrow">→</span></a>
-      <div class="socials">
-        <a href="https://www.linkedin.com/in/saxena-shashwat/" target="_blank" rel="noopener" class="soc">↳ LinkedIn</a>
-        <a href="mailto:shashwatsaxena115@gmail.com" class="soc">↳ Email</a>
-        <a href="https://github.com/shashwatsaxena571" target="_blank" rel="noopener" class="soc">↳ GitHub</a>
-        <a href="assets/Shashwat_Saxena_Resume.pdf" download class="soc soc-cv">↳ Download résumé ↓</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-</main>
+</div>
 
 <footer>
-  <div class="wrap foot-inner">
-    <span>© 2026 SHASHWAT.SYS · DATA ENGINEER · PUNE / IN</span>
-    <a href="#hero" class="to-top navlink">↑ RETURN TO TOP</a>
-  </div>
+  <div>© 2026 Shashwat Saxena · Pune, India</div>
+  <div>Made with direction, not just AI ✦</div>
 </footer>
 
-<script src="engine.js"></script>
-<script src="field.js"></script>
-<script src="boot.js"></script>
-<script src="main.js"></script>
+</div>
+
+<script>
+  // =====================================================================
+  //  THREE.JS — smoke bg + ink trail + 20k morphing particles +
+  //  click shockwaves + knot + FULL POST PIPELINE (bloom, CA, vignette)
+  // =====================================================================
+  const canvas = document.getElementById('gl');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.autoClear = false;
+
+  // ---------- Ink trail texture (mouse smoke) ----------
+  const trailC = document.createElement('canvas');
+  trailC.width = 256; trailC.height = 144;
+  const tctx = trailC.getContext('2d');
+  tctx.fillStyle = '#000'; tctx.fillRect(0, 0, 256, 144);
+  const trailTex = new THREE.CanvasTexture(trailC);
+  let tpx = -100, tpy = -100;
+
+  // ---------- Background smoke shader ----------
+  const bgScene = new THREE.Scene();
+  const bgCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+  const bgUniforms = {
+    uTime: { value: 0 },
+    uMouse: { value: new THREE.Vector2(0, 0) },
+    uRes: { value: new THREE.Vector2(innerWidth, innerHeight) },
+    uScroll: { value: 0 },
+    uTint: { value: new THREE.Color(0x7c6cff) },
+    uTrail: { value: trailTex }
+  };
+  bgScene.add(new THREE.Mesh(
+    new THREE.PlaneGeometry(2, 2),
+    new THREE.ShaderMaterial({
+      uniforms: bgUniforms, depthWrite: false, depthTest: false,
+      vertexShader: `void main(){ gl_Position = vec4(position, 1.0); }`,
+      fragmentShader: `
+        precision highp float;
+        uniform float uTime; uniform vec2 uMouse; uniform vec2 uRes; uniform float uScroll;
+        uniform vec3 uTint; uniform sampler2D uTrail;
+        float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+        float noise(vec2 p){
+          vec2 i = floor(p), f = fract(p);
+          vec2 u = f*f*(3.0-2.0*f);
+          return mix(mix(hash(i), hash(i+vec2(1.,0.)), u.x),
+                     mix(hash(i+vec2(0.,1.)), hash(i+vec2(1.,1.)), u.x), u.y);
+        }
+        float fbm(vec2 p){
+          float v = 0.0, a = 0.5;
+          mat2 rot = mat2(1.6, 1.2, -1.2, 1.6);
+          for(int i = 0; i < 5; i++){ v += a * noise(p); p = rot * p; a *= 0.5; }
+          return v;
+        }
+        void main(){
+          vec2 uvn = gl_FragCoord.xy / uRes;
+          vec2 p = (gl_FragCoord.xy - .5*uRes.xy) / uRes.y;
+          float t = uTime * 0.06;
+          float tr = texture2D(uTrail, vec2(uvn.x, 1.0 - uvn.y)).r;
+          p += tr * 0.12;
+          vec2 q = vec2(fbm(p*1.6 + t), fbm(p*1.6 - t*0.7 + 4.0));
+          vec2 r = vec2(fbm(p*2.2 + q*1.4 + t*0.8), fbm(p*2.2 + q*1.4 - t*0.5 + 8.0));
+          float f = fbm(p*2.0 + r*1.6 + uMouse*0.35 - uScroll*0.8);
+          vec3 tintCloud = mix(vec3(0.486,0.424,1.0), uTint, 0.45);
+          vec3 col = vec3(0.024, 0.024, 0.04);
+          col = mix(col, tintCloud*0.5, smoothstep(0.42,0.85,f)*0.55);
+          col = mix(col, vec3(0.302,0.839,0.757)*0.42, smoothstep(0.5,0.95,fbm(p*2.6 - r + t))*0.42);
+          col = mix(col, vec3(1.0,0.43,0.78)*0.35, smoothstep(0.62,1.0,fbm(p*3.2 + q - t*0.6))*0.3);
+          float d = length(p - uMouse*vec2(0.9,-0.5));
+          col += tintCloud * 0.12 * exp(-d*d*6.0);
+          col += uTint * tr * 0.22;
+          col *= mix(0.55, 1.0, smoothstep(1.25, 0.35, length(p)));
+          gl_FragColor = vec4(col, 1.0);
+        }
+      `
+    })
+  ));
+
+  // ---------- Main scene ----------
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, .1, 100);
+  camera.position.z = 26;
+
+  const COUNT = 20000;
+  function galaxyTargets() {
+    const a = new Float32Array(COUNT*3);
+    for (let i = 0; i < COUNT; i++) {
+      const rand = Math.random();
+      const r = Math.pow(rand, 0.7) * 9;
+      const angle = rand * Math.PI * 7 + (Math.random()-.5)*.6;
+      const gauss = (Math.random()+Math.random()+Math.random()-1.5) * .8;
+      a[i*3]   = Math.cos(angle) * r;
+      a[i*3+1] = gauss * (1.1 - r/10);
+      a[i*3+2] = Math.sin(angle) * r * .6;
+    }
+    return a;
+  }
+  function sphereTargets() {
+    const a = new Float32Array(COUNT*3);
+    for (let i = 0; i < COUNT; i++) {
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2*Math.random() - 1);
+      const r = 3.4 + (Math.random()-.5)*.15;
+      a[i*3]   = r * Math.sin(phi) * Math.cos(theta);
+      a[i*3+1] = r * Math.cos(phi);
+      a[i*3+2] = r * Math.sin(phi) * Math.sin(theta);
+    }
+    return a;
+  }
+  function helixTargets() {
+    const a = new Float32Array(COUNT*3);
+    for (let i = 0; i < COUNT; i++) {
+      const f = i / COUNT;
+      const strand = i % 2;
+      if (i % 11 === 0) {
+        const yy = (Math.random() - .5) * 9;
+        const ang = yy * 1.4;
+        const k = Math.random() * 2 - 1;
+        a[i*3]   = Math.cos(ang + (k>0?0:Math.PI)) * 2.2 * Math.abs(k);
+        a[i*3+1] = yy;
+        a[i*3+2] = Math.sin(ang + (k>0?0:Math.PI)) * 2.2 * Math.abs(k);
+      } else {
+        const y = (f - .5) * 9;
+        const ang = y * 1.4 + strand * Math.PI;
+        a[i*3]   = Math.cos(ang) * 2.2 + (Math.random()-.5)*.12;
+        a[i*3+1] = y;
+        a[i*3+2] = Math.sin(ang) * 2.2 + (Math.random()-.5)*.12;
+      }
+    }
+    return a;
+  }
+  function textTargets(str) {
+    const c = document.createElement('canvas');
+    c.width = 1200; c.height = 220;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#fff';
+    ctx.font = '800 150px Inter, Helvetica, Arial, sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(str, 600, 115);
+    const img = ctx.getImageData(0, 0, 1200, 220).data;
+    const pts = [];
+    for (let y = 0; y < 220; y += 2)
+      for (let x = 0; x < 1200; x += 2)
+        if (img[(y*1200 + x)*4 + 3] > 128) pts.push([x, y]);
+    const a = new Float32Array(COUNT*3);
+    for (let i = 0; i < COUNT; i++) {
+      const p = pts[(Math.random() * pts.length) | 0] || [600, 110];
+      a[i*3]   = (p[0]/1200 - .5) * 15;
+      a[i*3+1] = -(p[1]/220 - .5) * 2.75;
+      a[i*3+2] = (Math.random()-.5) * .5;
+    }
+    return a;
+  }
+
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(galaxyTargets(), 3));
+  geo.setAttribute('aSphere', new THREE.BufferAttribute(sphereTargets(), 3));
+  geo.setAttribute('aHelix', new THREE.BufferAttribute(helixTargets(), 3));
+  geo.setAttribute('aText', new THREE.BufferAttribute(textTargets('SHASHWAT'), 3));
+  const rands = new Float32Array(COUNT);
+  for (let i = 0; i < COUNT; i++) rands[i] = Math.random();
+  geo.setAttribute('aRand', new THREE.BufferAttribute(rands, 1));
+
+  const shockVecs = [new THREE.Vector4(0,0,-100,0), new THREE.Vector4(0,0,-100,0), new THREE.Vector4(0,0,-100,0)];
+  const pUniforms = {
+    uTime: { value: 0 },
+    uMorph: { value: 0 },
+    uMouse3: { value: new THREE.Vector3(99, 99, 0) },
+    uPx: { value: renderer.getPixelRatio() },
+    uShocks: { value: shockVecs }
+  };
+  const points = new THREE.Points(geo, new THREE.ShaderMaterial({
+    uniforms: pUniforms,
+    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+    vertexShader: `
+      attribute vec3 aSphere;
+      attribute vec3 aHelix;
+      attribute vec3 aText;
+      attribute float aRand;
+      uniform float uTime;
+      uniform float uMorph;
+      uniform vec3 uMouse3;
+      uniform float uPx;
+      uniform vec4 uShocks[3];
+      varying float vRand;
+      varying float vGlow;
+      void main(){
+        vRand = aRand;
+        float m = clamp(uMorph, 0.0, 3.0);
+        vec3 pos;
+        if (m < 1.0)      pos = mix(position, aSphere, smoothstep(0.0, 1.0, m));
+        else if (m < 2.0) pos = mix(aSphere, aHelix, smoothstep(0.0, 1.0, m - 1.0));
+        else              pos = mix(aHelix, aText, smoothstep(0.0, 1.0, m - 2.0));
+
+        float w = 0.06 + 0.05 * aRand;
+        pos.x += sin(uTime * (0.6 + aRand) + aRand * 40.0) * w;
+        pos.y += cos(uTime * (0.5 + aRand * 0.7) + aRand * 30.0) * w;
+        pos.z += sin(uTime * (0.4 + aRand * 0.5) + aRand * 20.0) * w;
+
+        vec3 diff = pos - uMouse3;
+        float d2 = dot(diff, diff);
+        float force = exp(-d2 * 0.35);
+        pos += normalize(diff + 0.0001) * force * 1.4;
+        vGlow = force;
+
+        // click shockwaves
+        for (int i = 0; i < 3; i++) {
+          vec4 s = uShocks[i];
+          float age = uTime - s.z;
+          if (age > 0.0 && age < 2.5) {
+            vec2 dxy = pos.xy - s.xy;
+            float dd = length(dxy);
+            float wf = age * 4.5;
+            float band = exp(-pow(dd - wf, 2.0) * 2.2);
+            float decay = exp(-age * 1.8);
+            pos.xy += normalize(dxy + 0.001) * band * decay * 1.3 * s.w;
+            vGlow += band * decay * 0.7;
+          }
+        }
+
+        vec4 mv = modelViewMatrix * vec4(pos, 1.0);
+        gl_Position = projectionMatrix * mv;
+        gl_PointSize = (42.0 * (0.5 + aRand)) / max(1.0, -mv.z) * uPx;
+      }
+    `,
+    fragmentShader: `
+      precision highp float;
+      varying float vRand;
+      varying float vGlow;
+      void main(){
+        float d = length(gl_PointCoord - 0.5);
+        float alpha = smoothstep(0.5, 0.08, d);
+        vec3 purple = vec3(0.486, 0.424, 1.0);
+        vec3 teal = vec3(0.302, 0.839, 0.757);
+        vec3 pink = vec3(1.0, 0.43, 0.78);
+        vec3 col = mix(purple, teal, vRand);
+        if (vRand > 0.94) col = pink;
+        col += vGlow * 0.8;
+        gl_FragColor = vec4(col, alpha * 0.85);
+      }
+    `
+  }));
+  scene.add(points);
+
+  // ---------- Hero knot ----------
+  const knotGroup = new THREE.Group();
+  const knot = new THREE.Mesh(
+    new THREE.TorusKnotGeometry(1.6, .45, 220, 36),
+    new THREE.MeshNormalMaterial()
+  );
+  knotGroup.add(knot);
+  const glowCanvas = document.createElement('canvas');
+  glowCanvas.width = glowCanvas.height = 256;
+  const gctx = glowCanvas.getContext('2d');
+  const grd = gctx.createRadialGradient(128,128,0,128,128,128);
+  grd.addColorStop(0, 'rgba(124,108,255,.55)');
+  grd.addColorStop(.4, 'rgba(77,214,193,.18)');
+  grd.addColorStop(1, 'rgba(0,0,0,0)');
+  gctx.fillStyle = grd; gctx.fillRect(0,0,256,256);
+  const glow = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: new THREE.CanvasTexture(glowCanvas),
+    blending: THREE.AdditiveBlending, depthWrite: false, transparent: true
+  }));
+  glow.scale.setScalar(11);
+  knotGroup.add(glow);
+  const ring = new THREE.Mesh(
+    new THREE.TorusGeometry(2.9, .012, 12, 120),
+    new THREE.MeshBasicMaterial({ color: 0x7c6cff, transparent: true, opacity: .5 })
+  );
+  ring.rotation.x = Math.PI / 2.4;
+  knotGroup.add(ring);
+  const ring2 = new THREE.Mesh(
+    new THREE.TorusGeometry(2.9, .012, 12, 120),
+    new THREE.MeshBasicMaterial({ color: 0x4dd6c1, transparent: true, opacity: .3 })
+  );
+  ring2.scale.setScalar(1.18);
+  ring2.rotation.x = Math.PI / 1.8;
+  knotGroup.add(ring2);
+  knotGroup.position.set(3.6, 0, 3);
+  scene.add(knotGroup);
+
+  // ---------- POST-PROCESSING PIPELINE (bloom + CA + vignette) ----------
+  const postVS = `varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position, 1.0); }`;
+  const postScene = new THREE.Scene();
+  const postQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), null);
+  postScene.add(postQuad);
+  function renderPass(mat, target) {
+    postQuad.material = mat;
+    renderer.setRenderTarget(target);
+    renderer.render(postScene, bgCam);
+  }
+  let RW = Math.floor(innerWidth * renderer.getPixelRatio());
+  let RH = Math.floor(innerHeight * renderer.getPixelRatio());
+  const mkRT = (w, h, depth) => new THREE.WebGLRenderTarget(w, h, {
+    minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: depth
+  });
+  let rtScene = mkRT(RW, RH, true);
+  let rtA = mkRT(RW>>1, RH>>1, false);
+  let rtB = mkRT(RW>>1, RH>>1, false);
+
+  const brightMat = new THREE.ShaderMaterial({
+    uniforms: { tDiffuse: { value: null }, uThresh: { value: 0.5 } },
+    vertexShader: postVS, depthTest: false, depthWrite: false,
+    fragmentShader: `
+      precision highp float;
+      varying vec2 vUv; uniform sampler2D tDiffuse; uniform float uThresh;
+      void main(){
+        vec3 c = texture2D(tDiffuse, vUv).rgb;
+        float l = dot(c, vec3(.299,.587,.114));
+        gl_FragColor = vec4(c * smoothstep(uThresh, uThresh + 0.4, l), 1.0);
+      }
+    `
+  });
+  const blurMat = new THREE.ShaderMaterial({
+    uniforms: { tDiffuse: { value: null }, uDir: { value: new THREE.Vector2(1,0) }, uRes: { value: new THREE.Vector2(RW>>1, RH>>1) } },
+    vertexShader: postVS, depthTest: false, depthWrite: false,
+    fragmentShader: `
+      precision highp float;
+      varying vec2 vUv; uniform sampler2D tDiffuse; uniform vec2 uDir; uniform vec2 uRes;
+      void main(){
+        vec2 px = uDir / uRes;
+        vec3 s = texture2D(tDiffuse, vUv).rgb * 0.227;
+        s += texture2D(tDiffuse, vUv + px*1.384).rgb * 0.316;
+        s += texture2D(tDiffuse, vUv - px*1.384).rgb * 0.316;
+        s += texture2D(tDiffuse, vUv + px*3.230).rgb * 0.0702;
+        s += texture2D(tDiffuse, vUv - px*3.230).rgb * 0.0702;
+        gl_FragColor = vec4(s, 1.0);
+      }
+    `
+  });
+  const compMat = new THREE.ShaderMaterial({
+    uniforms: { tScene: { value: null }, tBloom: { value: null } },
+    vertexShader: postVS, depthTest: false, depthWrite: false,
+    fragmentShader: `
+      precision highp float;
+      varying vec2 vUv; uniform sampler2D tScene; uniform sampler2D tBloom;
+      void main(){
+        vec2 cc = vUv - 0.5;
+        float r2 = dot(cc, cc);
+        vec2 off = cc * r2 * 0.055;
+        float r = texture2D(tScene, vUv - off).r;
+        float g = texture2D(tScene, vUv).g;
+        float b = texture2D(tScene, vUv + off).b;
+        vec3 col = vec3(r, g, b) + texture2D(tBloom, vUv).rgb * 1.0;
+        col *= 1.0 - 0.3 * smoothstep(0.18, 0.5, r2);
+        gl_FragColor = vec4(col, 1.0);
+      }
+    `
+  });
+
+  // ---------- Input & scroll state ----------
+  let mx = 0, my = 0, smx = 0, smy = 0, hasMouse = false;
+  addEventListener('mousemove', e => {
+    mx = (e.clientX / innerWidth - .5) * 2;
+    my = (e.clientY / innerHeight - .5) * 2;
+    tpx = e.clientX / innerWidth * 256;
+    tpy = e.clientY / innerHeight * 144;
+    hasMouse = true;
+  });
+
+  // click → shockwave + ripple
+  let shockIdx = 0;
+  addEventListener('click', e => {
+    const wx = (e.clientX / innerWidth - .5) * 2 * 8;
+    const wy = -(e.clientY / innerHeight - .5) * 2 * 4.5;
+    shockVecs[shockIdx].set(wx, wy, clock.getElapsedTime(), 1.0);
+    shockIdx = (shockIdx + 1) % 3;
+    const rip = document.createElement('div');
+    rip.className = 'click-ripple';
+    rip.style.left = e.clientX + 'px';
+    rip.style.top = e.clientY + 'px';
+    document.body.appendChild(rip);
+    setTimeout(() => rip.remove(), 750);
+  });
+
+  const content = document.querySelector('.content');
+  const smoothOK = matchMedia('(pointer: fine)').matches && innerWidth > 860;
+  let spacer = null;
+  if (smoothOK) {
+    content.style.position = 'fixed';
+    content.style.top = '0';
+    content.style.left = '0';
+    content.style.width = '100%';
+    content.style.willChange = 'transform';
+    spacer = document.createElement('div');
+    document.body.appendChild(spacer);
+    const setH = () => { spacer.style.height = content.scrollHeight + 'px'; };
+    setH();
+    addEventListener('resize', setH);
+    setTimeout(setH, 1200);
+    setTimeout(setH, 3000);
+  }
+  let cur = 0, scrollProg = 0, morphSm = 0, introStart = -1;
+
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const id = a.getAttribute('href');
+      if (id.length < 2) return;
+      const el = document.querySelector(id);
+      if (!el) return;
+      e.preventDefault();
+      const y = el.getBoundingClientRect().top + cur - 70;
+      scrollTo(0, Math.max(0, y));
+    });
+  });
+
+  function countUp(el) {
+    const target = +el.dataset.count, suffix = el.dataset.suffix || '';
+    const dur = 1400, start = performance.now();
+    (function step(now) {
+      const p = Math.min(1, (now - start) / dur);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(target * eased) + suffix;
+      if (p < 1) requestAnimationFrame(step);
+    })(start);
+  }
+  const reveals = [...document.querySelectorAll('.reveal')];
+  const staggers = [...document.querySelectorAll('.cards, .stats')];
+  function checkReveals() {
+    for (let i = reveals.length - 1; i >= 0; i--) {
+      const el = reveals[i];
+      if (el.getBoundingClientRect().top < innerHeight * .88) {
+        el.classList.add('visible');
+        el.querySelectorAll('[data-count]').forEach(countUp);
+        reveals.splice(i, 1);
+      }
+    }
+    for (let i = staggers.length - 1; i >= 0; i--) {
+      const el = staggers[i];
+      if (el.getBoundingClientRect().top < innerHeight * .82) {
+        el.classList.add('go');
+        // count-up starts as the cards land
+        setTimeout(() => el.querySelectorAll('[data-count]').forEach(countUp), 550);
+        staggers.splice(i, 1);
+      }
+    }
+  }
+
+  const hintDots = [...document.querySelectorAll('.stage-hint .dot')];
+  const stageTints = [new THREE.Color(0x7c6cff), new THREE.Color(0x4dd6c1), new THREE.Color(0xff6ec7), new THREE.Color(0xffb757)];
+
+  const clock = new THREE.Clock();
+  let frame = 0;
+  function tick() {
+    const t = clock.getElapsedTime();
+    frame++;
+    smx += (mx - smx) * .04;
+    smy += (my - smy) * .04;
+
+    // ink trail fade + blob
+    tctx.globalCompositeOperation = 'source-over';
+    tctx.fillStyle = 'rgba(0,0,0,0.06)';
+    tctx.fillRect(0, 0, 256, 144);
+    if (hasMouse) {
+      const g2 = tctx.createRadialGradient(tpx, tpy, 0, tpx, tpy, 16);
+      g2.addColorStop(0, 'rgba(255,255,255,0.5)');
+      g2.addColorStop(1, 'rgba(255,255,255,0)');
+      tctx.fillStyle = g2;
+      tctx.fillRect(tpx-16, tpy-16, 32, 32);
+    }
+    trailTex.needsUpdate = true;
+
+    // smooth scroll + velocity skew
+    const targetY = window.scrollY;
+    let vel = 0;
+    if (smoothOK) {
+      vel = targetY - cur;
+      cur += vel * .085;
+      if (Math.abs(targetY - cur) < .1) cur = targetY;
+      const skew = Math.max(-3.5, Math.min(3.5, vel * .01));
+      content.style.transform = `translate3d(0, ${-cur}px, 0) skewY(${skew}deg)`;
+    } else {
+      cur = targetY;
+    }
+    const docMax = Math.max(1, (smoothOK ? spacer.offsetHeight : document.body.scrollHeight) - innerHeight);
+    scrollProg = Math.min(1, cur / docMax);
+
+    if (window.__forceMorph != null) morphSm = window.__forceMorph;
+    else morphSm += (scrollProg * 3 - morphSm) * .06;
+    pUniforms.uMorph.value = morphSm;
+    pUniforms.uTime.value = t;
+    if (hasMouse) pUniforms.uMouse3.value.set(smx * 8, -smy * 4.5, 0);
+    else pUniforms.uMouse3.value.set(99, 99, 0);
+
+    // stage tint (galaxy purple → globe teal → helix pink → name gold)
+    const si = Math.min(2, Math.floor(morphSm));
+    const sf = Math.min(1, morphSm - si);
+    bgUniforms.uTint.value.copy(stageTints[si]).lerp(stageTints[si+1], sf);
+
+    bgUniforms.uTime.value = t;
+    bgUniforms.uMouse.value.set(smx, smy);
+    bgUniforms.uScroll.value = scrollProg;
+
+    const textness = Math.max(0, Math.min(1, (morphSm - 2.2) / .6));
+    if (textness > .5) {
+      points.rotation.y += (0 - points.rotation.y) * .04;
+      points.rotation.x += (0 - points.rotation.x) * .04;
+    } else {
+      const tiltBase = -.95 * Math.max(0, 1 - morphSm);
+      points.rotation.y += .0009 + smx * .0004;
+      points.rotation.x += ((tiltBase + smy * .12) - points.rotation.x) * .03;
+    }
+
+    const ks = Math.max(0, 1 - Math.max(scrollProg * 2.6, morphSm * 2.2));
+    knotGroup.visible = ks > .01;
+    if (knotGroup.visible) {
+      knotGroup.scale.setScalar(ks);
+      knot.rotation.x = t * .35;
+      knot.rotation.y = t * .5 + smx * .4;
+      knotGroup.position.y = Math.sin(t * .6) * .3;
+      ring.rotation.z = t * .4;
+      ring2.rotation.z = -t * .3;
+    }
+
+    // camera: intro fly-in, then scroll dive
+    let zoomBase = 26;
+    if (introStart >= 0) {
+      const e = Math.min(1, (t - introStart) / 2.4);
+      zoomBase = 26 - 15 * (1 - Math.pow(1 - e, 3));
+    }
+    camera.position.z = zoomBase - scrollProg * 2.5;
+    camera.position.x = smx * .9;
+    camera.position.y = -smy * .55;
+    camera.lookAt(0, 0, 0);
+
+    // ---- render through post pipeline ----
+    renderer.setRenderTarget(rtScene);
+    renderer.clear();
+    renderer.render(bgScene, bgCam);
+    renderer.render(scene, camera);
+
+    brightMat.uniforms.tDiffuse.value = rtScene.texture;
+    renderPass(brightMat, rtA);
+    for (let i = 0; i < 3; i++) {
+      blurMat.uniforms.tDiffuse.value = rtA.texture;
+      blurMat.uniforms.uDir.value.set(1 + i, 0);
+      renderPass(blurMat, rtB);
+      blurMat.uniforms.tDiffuse.value = rtB.texture;
+      blurMat.uniforms.uDir.value.set(0, 1 + i);
+      renderPass(blurMat, rtA);
+    }
+    compMat.uniforms.tScene.value = rtScene.texture;
+    compMat.uniforms.tBloom.value = rtA.texture;
+    renderPass(compMat, null);
+
+    if (frame % 4 === 0) {
+      checkReveals();
+      const stage = Math.min(3, Math.round(morphSm));
+      hintDots.forEach((d, i) => d.classList.toggle('on', i === stage));
+    }
+    requestAnimationFrame(tick);
+  }
+  tick();
+
+  addEventListener('resize', () => {
+    camera.aspect = innerWidth / innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+    bgUniforms.uRes.value.set(innerWidth, innerHeight);
+    RW = Math.floor(innerWidth * renderer.getPixelRatio());
+    RH = Math.floor(innerHeight * renderer.getPixelRatio());
+    rtScene.setSize(RW, RH);
+    rtA.setSize(RW>>1, RH>>1);
+    rtB.setSize(RW>>1, RH>>1);
+    blurMat.uniforms.uRes.value.set(RW>>1, RH>>1);
+  });
+
+  // ---------- Preloader ----------
+  const pre = document.getElementById('preloader');
+  const plcount = document.getElementById('plcount');
+  const plbar = document.getElementById('plbar');
+  let prog = 0;
+  const iv = setInterval(() => {
+    prog += Math.ceil(Math.random() * 14);
+    if (prog >= 100) {
+      prog = 100;
+      clearInterval(iv);
+      setTimeout(() => {
+        pre.classList.add('done');
+        document.body.classList.add('loaded');
+        introStart = clock.getElapsedTime();
+        setTimeout(() => { pre.style.display = 'none'; }, 1100);
+        setTimeout(() => { document.body.classList.add('settle'); }, 3200);
+      }, 250);
+    }
+    plcount.textContent = prog;
+    plbar.style.width = prog + '%';
+  }, 75);
+
+  // ---------- Custom cursor ----------
+  const cdot = document.getElementById('cdot');
+  const cring = document.getElementById('cring');
+  let rx = innerWidth/2, ry = innerHeight/2, px = rx, py = ry;
+  addEventListener('mousemove', e => {
+    px = e.clientX; py = e.clientY;
+    cdot.style.left = px + 'px';
+    cdot.style.top = py + 'px';
+  });
+  (function ringLoop(){
+    rx += (px - rx) * .16;
+    ry += (py - ry) * .16;
+    cring.style.left = rx + 'px';
+    cring.style.top = ry + 'px';
+    requestAnimationFrame(ringLoop);
+  })();
+  document.querySelectorAll('a, .card, .stat').forEach(el => {
+    el.addEventListener('mouseenter', () => cring.classList.add('hot'));
+    el.addEventListener('mouseleave', () => cring.classList.remove('hot'));
+  });
+
+  // ---------- Magnetic buttons ----------
+  document.querySelectorAll('.magnetic').forEach(btn => {
+    btn.addEventListener('mousemove', e => {
+      const r = btn.getBoundingClientRect();
+      btn.style.transform = `translate(${(e.clientX - r.left - r.width/2) * .25}px, ${(e.clientY - r.top - r.height/2) * .35}px)`;
+    });
+    btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
+  });
+
+  // ---------- 3D tilt cards ----------
+  document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      const pxx = (e.clientX - r.left) / r.width - .5;
+      const pyy = (e.clientY - r.top) / r.height - .5;
+      card.style.transform = `rotateY(${pxx * 10}deg) rotateX(${-pyy * 10}deg) translateZ(6px)`;
+      card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+      card.style.setProperty('--my', (e.clientY - r.top) + 'px');
+    });
+    card.addEventListener('mouseleave', () => { card.style.transform = ''; });
+    if (card.dataset.href) {
+      card.addEventListener('click', () => window.open(card.dataset.href, '_blank', 'noopener'));
+    }
+  });
+
+  // ---------- Marquee ----------
+  const mq = document.getElementById('marquee');
+  mq.innerHTML += mq.innerHTML;
+
+  // ---------- Title easter egg ----------
+  const realTitle = document.title;
+  addEventListener('blur', () => { document.title = '👀 wapas aao…'; });
+  addEventListener('focus', () => { document.title = realTitle; });
+
+  // ---------- Debug hooks ----------
+  const morphHash = location.hash.match(/^#m([\d.]+)$/);
+  if (morphHash) {
+    window.__forceMorph = +morphHash[1];
+    clearInterval(iv);
+    pre.style.display = 'none';
+    document.body.classList.add('loaded', 'settle');
+    introStart = 0;
+  }
+  const hashMatch = location.hash.match(/^#s(\d+)$/);
+  const qp = new URLSearchParams(location.search);
+  if (hashMatch) qp.set('scroll', hashMatch[1]);
+  if (qp.has('scroll')) {
+    clearInterval(iv);
+    pre.style.display = 'none';
+    document.body.classList.add('loaded', 'settle');
+    introStart = 0;
+    const sy = +qp.get('scroll');
+    scrollTo(0, sy);
+    cur = sy;
+    const dm = Math.max(1, (smoothOK ? spacer.offsetHeight : document.body.scrollHeight) - innerHeight);
+    morphSm = Math.min(1, sy / dm) * 3;
+  }
+</script>
 </body>
 </html>
