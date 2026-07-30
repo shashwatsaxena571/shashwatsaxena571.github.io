@@ -1042,8 +1042,7 @@
       vel = targetY - cur;
       cur += vel * .085;
       if (Math.abs(targetY - cur) < .1) cur = targetY;
-      const skew = Math.max(-3.5, Math.min(3.5, vel * .01));
-      content.style.transform = `translate3d(0, ${-cur}px, 0) skewY(${skew}deg)`;
+      content.style.transform = `translate3d(0, ${-cur}px, 0)`;
     } else {
       cur = targetY;
     }
