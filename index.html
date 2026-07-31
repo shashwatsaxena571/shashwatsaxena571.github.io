@@ -169,7 +169,7 @@
   .btn-ghost {
     padding: 16px 36px; border-radius: 100px; border: 1px solid var(--line); color: var(--ink);
     text-decoration: none; font-size: 15px; font-weight: 600; transition: border-color .25s, background .25s;
-    backdrop-filter: blur(6px); will-change: transform; display: inline-block;
+    will-change: transform; display: inline-block;
   }
   .btn-ghost:hover { border-color: var(--accent); background: rgba(124,108,255,.08); }
   .scroll-hint {
@@ -195,7 +195,7 @@
   .marquee {
     border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
     overflow: hidden; padding: 26px 0; white-space: nowrap;
-    background: rgba(12,12,20,.7); backdrop-filter: blur(8px);
+    background: rgba(12,12,20,.85);
   }
   .marquee-track { display: inline-block; animation: scroll 26s linear infinite; }
   .marquee span { font-size: 22px; font-weight: 700; letter-spacing: 1px; margin: 0 34px; color: var(--muted); }
@@ -218,7 +218,7 @@
   .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; perspective: 1200px; }
   .stat {
     padding: 36px 28px; border: 1px solid var(--line); border-radius: 20px;
-    background: rgba(12,12,20,.55); backdrop-filter: blur(10px);
+    background: rgba(12,12,20,.78);
     transition: transform .3s, border-color .3s;
     opacity: 0;
   }
@@ -233,7 +233,7 @@
   .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 26px; perspective: 1400px; }
   .card {
     position: relative; border: 1px solid var(--line); border-radius: 24px; padding: 42px;
-    background: rgba(12,12,20,.6); backdrop-filter: blur(10px);
+    background: rgba(12,12,20,.8);
     overflow: hidden; transition: border-color .35s;
     transform-style: preserve-3d; will-change: transform;
     opacity: 0;
@@ -337,7 +337,6 @@
     border: 1px solid rgba(124,108,255,.35); border-radius: 30px; padding: 72px 48px;
     text-align: center; position: relative; overflow: hidden;
     background: linear-gradient(160deg, rgba(124,108,255,.12), rgba(77,214,193,.05));
-    backdrop-filter: blur(10px);
   }
   .nl-card::before {
     content: ""; position: absolute; top: -120px; left: 50%; transform: translateX(-50%);
@@ -610,7 +609,7 @@
   const canvas = document.getElementById('gl');
   const IS_MOBILE = innerWidth < 700 || matchMedia('(pointer: coarse)').matches;
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: !IS_MOBILE });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, IS_MOBILE ? 1.5 : 2));
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
   renderer.setSize(innerWidth, innerHeight);
   renderer.autoClear = false;
 
@@ -1046,6 +1045,20 @@
   const hintDots = [...document.querySelectorAll('.stage-hint .dot')];
   const stageTints = [new THREE.Color(0x7c6cff), new THREE.Color(0x4dd6c1), new THREE.Color(0xff6ec7), new THREE.Color(0xffb757)];
 
+  // Adaptive quality state — steps down if the frame rate can't hold
+  let lastT = 0, fpsAcc = 0, fpsN = 0, qualityStep = 0, postOn = true;
+  function applyPixelRatio(r) {
+    renderer.setPixelRatio(r);
+    renderer.setSize(innerWidth, innerHeight);
+    RW = Math.floor(innerWidth * r);
+    RH = Math.floor(innerHeight * r);
+    rtScene.setSize(RW, RH);
+    rtA.setSize(RW>>1, RH>>1);
+    rtB.setSize(RW>>1, RH>>1);
+    blurMat.uniforms.uRes.value.set(RW>>1, RH>>1);
+    pUniforms.uPx.value = r;
+  }
+
   const clock = new THREE.Clock();
   let frame = 0;
   function tick() {
@@ -1131,25 +1144,45 @@
     camera.position.y = -smy * .55;
     camera.lookAt(0, 0, 0);
 
-    // ---- render through post pipeline ----
-    renderer.setRenderTarget(rtScene);
-    renderer.clear();
-    renderer.render(bgScene, bgCam);
-    renderer.render(scene, camera);
-
-    brightMat.uniforms.tDiffuse.value = rtScene.texture;
-    renderPass(brightMat, rtA);
-    for (let i = 0; i < 3; i++) {
-      blurMat.uniforms.tDiffuse.value = rtA.texture;
-      blurMat.uniforms.uDir.value.set(1 + i, 0);
-      renderPass(blurMat, rtB);
-      blurMat.uniforms.tDiffuse.value = rtB.texture;
-      blurMat.uniforms.uDir.value.set(0, 1 + i);
-      renderPass(blurMat, rtA);
+    // ---- adaptive quality: drop resolution, then bloom, if FPS dips ----
+    if (lastT > 0) {
+      fpsAcc += (t - lastT); fpsN++;
+      if (fpsAcc > 1.2) {
+        const fps = fpsN / fpsAcc;
+        fpsAcc = 0; fpsN = 0;
+        if (t > 5) {
+          if (fps < 45 && qualityStep === 0) { qualityStep = 1; applyPixelRatio(1); }
+          else if (fps < 42 && qualityStep === 1) { qualityStep = 2; postOn = false; renderer.setRenderTarget(null); }
+        }
+      }
     }
-    compMat.uniforms.tScene.value = rtScene.texture;
-    compMat.uniforms.tBloom.value = rtA.texture;
-    renderPass(compMat, null);
+    lastT = t;
+
+    // ---- render (post pipeline, or direct when in low-quality mode) ----
+    if (postOn) {
+      renderer.setRenderTarget(rtScene);
+      renderer.clear();
+      renderer.render(bgScene, bgCam);
+      renderer.render(scene, camera);
+
+      brightMat.uniforms.tDiffuse.value = rtScene.texture;
+      renderPass(brightMat, rtA);
+      for (let i = 0; i < 2; i++) {
+        blurMat.uniforms.tDiffuse.value = rtA.texture;
+        blurMat.uniforms.uDir.value.set(1 + i, 0);
+        renderPass(blurMat, rtB);
+        blurMat.uniforms.tDiffuse.value = rtB.texture;
+        blurMat.uniforms.uDir.value.set(0, 1 + i);
+        renderPass(blurMat, rtA);
+      }
+      compMat.uniforms.tScene.value = rtScene.texture;
+      compMat.uniforms.tBloom.value = rtA.texture;
+      renderPass(compMat, null);
+    } else {
+      renderer.clear();
+      renderer.render(bgScene, bgCam);
+      renderer.render(scene, camera);
+    }
 
     if (frame % 4 === 0) {
       checkReveals();
