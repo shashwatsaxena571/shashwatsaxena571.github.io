@@ -980,7 +980,7 @@
   });
 
   const content = document.querySelector('.content');
-  const smoothOK = matchMedia('(pointer: fine)').matches && innerWidth > 860;
+  let smoothOK = matchMedia('(pointer: fine)').matches && innerWidth > 860;
   let spacer = null;
   if (smoothOK) {
     content.style.position = 'fixed';
@@ -1089,7 +1089,7 @@
     let vel = 0;
     if (smoothOK) {
       vel = targetY - cur;
-      cur += vel * .085;
+      cur += vel * .12;
       if (Math.abs(targetY - cur) < .1) cur = targetY;
       const skew = Math.max(-3.5, Math.min(3.5, vel * .01));
       content.style.transform = `translate3d(0, ${-cur}px, 0) skewY(${skew}deg)`;
@@ -1157,6 +1157,19 @@
         if (t > 5) {
           if (fps < 45 && qualityStep === 0) { qualityStep = 1; applyPixelRatio(1); }
           else if (fps < 42 && qualityStep === 1) { qualityStep = 2; postOn = false; renderer.setRenderTarget(null); }
+          else if (fps < 42 && qualityStep === 2 && smoothOK) {
+            // last resort: hand scrolling back to the browser (kills big-layer jank)
+            qualityStep = 3;
+            smoothOK = false;
+            content.style.position = '';
+            content.style.top = '';
+            content.style.left = '';
+            content.style.width = '';
+            content.style.willChange = '';
+            content.style.transform = '';
+            if (spacer) spacer.style.display = 'none';
+            docMaxCache = 0;
+          }
         }
       }
     }
