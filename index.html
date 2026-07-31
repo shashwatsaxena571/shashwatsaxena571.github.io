@@ -118,13 +118,13 @@
   }
   /* Readability: dark glow behind all display text so particles never swallow it */
   h1, h2, .titem h3, .card h3, .stat .num {
-    text-shadow: 0 2px 26px rgba(4,4,10,.95), 0 0 60px rgba(4,4,10,.8), 0 0 110px rgba(4,4,10,.6);
+    text-shadow: 0 2px 18px rgba(4,4,10,.95), 0 0 44px rgba(4,4,10,.75);
   }
   .hero p, .cta-wrap p, .titem p, .twhen, .eyebrow, .section-tag, .nl-sub, .edu-row span, .scroll-hint {
-    text-shadow: 0 1px 12px rgba(4,4,10,.95), 0 0 30px rgba(4,4,10,.8);
+    text-shadow: 0 1px 10px rgba(4,4,10,.95);
   }
   h1 .stroke {
-    text-shadow: 0 2px 30px rgba(4,4,10,.95), 0 0 70px rgba(4,4,10,.85);
+    text-shadow: 0 2px 20px rgba(4,4,10,.95);
   }
   .eyebrow {
     display: inline-flex; align-items: center; gap: 10px;
@@ -990,13 +990,17 @@
     content.style.willChange = 'transform';
     spacer = document.createElement('div');
     document.body.appendChild(spacer);
-    const setH = () => { spacer.style.height = content.scrollHeight + 'px'; };
+    const setH = () => {
+      spacer.style.height = content.scrollHeight + 'px';
+      docMaxCache = Math.max(1, spacer.offsetHeight - innerHeight);
+    };
     setH();
     addEventListener('resize', setH);
     setTimeout(setH, 1200);
     setTimeout(setH, 3000);
   }
   let cur = 0, scrollProg = 0, morphSm = 0, introStart = -1;
+  let docMaxCache = 0;
 
   document.querySelectorAll('a[href^="#"]').forEach(a => {
     a.addEventListener('click', e => {
@@ -1092,8 +1096,8 @@
     } else {
       cur = targetY;
     }
-    const docMax = Math.max(1, (smoothOK ? spacer.offsetHeight : document.body.scrollHeight) - innerHeight);
-    scrollProg = Math.min(1, cur / docMax);
+    if (!docMaxCache) docMaxCache = Math.max(1, (smoothOK ? spacer.offsetHeight : document.body.scrollHeight) - innerHeight);
+    scrollProg = Math.min(1, cur / docMaxCache);
 
     if (window.__forceMorph != null) morphSm = window.__forceMorph;
     else morphSm += (scrollProg * 3 - morphSm) * .06;
@@ -1184,7 +1188,7 @@
       renderer.render(scene, camera);
     }
 
-    if (frame % 4 === 0) {
+    if (frame % 4 === 0 && Math.abs(vel) < 90) {
       checkReveals();
       const stage = Math.min(3, Math.round(morphSm));
       hintDots.forEach((d, i) => d.classList.toggle('on', i === stage));
@@ -1194,6 +1198,7 @@
   tick();
 
   addEventListener('resize', () => {
+    docMaxCache = 0;
     camera.aspect = innerWidth / innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(innerWidth, innerHeight);
