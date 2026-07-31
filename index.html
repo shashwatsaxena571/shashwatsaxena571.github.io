@@ -981,6 +981,7 @@
 
   const content = document.querySelector('.content');
   let smoothOK = matchMedia('(pointer: fine)').matches && innerWidth > 860;
+  let docMaxCache = 0;
   let spacer = null;
   if (smoothOK) {
     content.style.position = 'fixed';
@@ -1000,7 +1001,6 @@
     setTimeout(setH, 3000);
   }
   let cur = 0, scrollProg = 0, morphSm = 0, introStart = -1;
-  let docMaxCache = 0;
 
   document.querySelectorAll('a[href^="#"]').forEach(a => {
     a.addEventListener('click', e => {
