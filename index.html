@@ -360,6 +360,26 @@
     .cards { grid-template-columns: 1fr; }
     .watermark { display: none; }
   }
+  @media (max-width: 700px) {
+    nav { padding: 14px 20px; }
+    .hero { padding: 110px 22px 70px; min-height: 100svh; }
+    h1 { font-size: clamp(38px, 11vw, 60px); letter-spacing: -1.5px; }
+    h1 .stroke { -webkit-text-stroke-width: 1px; }
+    .hero p { font-size: 16px; margin-top: 24px; }
+    .hero-row { flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+    .btn-primary, .btn-ghost { padding: 14px 26px; font-size: 14px; }
+    section { padding: 90px 22px; }
+    .cta-wrap { padding: 120px 22px 100px; }
+    .nl-wrap { padding: 30px 22px 90px; }
+    .nl-card { padding: 48px 24px; }
+    h2 { margin-bottom: 40px; }
+    .marquee span { font-size: 16px; margin: 0 20px; }
+    .timeline { padding-left: 24px; gap: 42px; }
+    .tdot { left: -30px; }
+    .stat { padding: 26px 18px; }
+    .stat .num { font-size: 34px; }
+    .card { padding: 30px 24px; }
+  }
 </style>
 </head>
 <body>
@@ -588,8 +608,9 @@
   //  click shockwaves + knot + FULL POST PIPELINE (bloom, CA, vignette)
   // =====================================================================
   const canvas = document.getElementById('gl');
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  const IS_MOBILE = innerWidth < 700 || matchMedia('(pointer: coarse)').matches;
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: !IS_MOBILE });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, IS_MOBILE ? 1.5 : 2));
   renderer.setSize(innerWidth, innerHeight);
   renderer.autoClear = false;
 
@@ -663,7 +684,7 @@
   const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, .1, 100);
   camera.position.z = 26;
 
-  const COUNT = 20000;
+  const COUNT = IS_MOBILE ? 9000 : 20000;
   function galaxyTargets() {
     const a = new Float32Array(COUNT*3);
     for (let i = 0; i < COUNT; i++) {
@@ -727,8 +748,9 @@
     const a = new Float32Array(COUNT*3);
     for (let i = 0; i < COUNT; i++) {
       const p = pts[(Math.random() * pts.length) | 0] || [600, 110];
-      a[i*3]   = (p[0]/1200 - .5) * 15;
-      a[i*3+1] = -(p[1]/220 - .5) * 2.75;
+      const TW = IS_MOBILE ? 7.5 : 15;
+      a[i*3]   = (p[0]/1200 - .5) * TW;
+      a[i*3+1] = -(p[1]/220 - .5) * (TW * .1833);
       a[i*3+2] = (Math.random()-.5) * .5;
     }
     return a;
@@ -858,7 +880,10 @@
   ring2.scale.setScalar(1.18);
   ring2.rotation.x = Math.PI / 1.8;
   knotGroup.add(ring2);
-  knotGroup.position.set(3.6, 0, 3);
+  const KNOT_X = IS_MOBILE ? 0.9 : 3.6;
+  const KNOT_Y = IS_MOBILE ? 2.6 : 0;
+  const KNOT_S = IS_MOBILE ? 0.55 : 1;
+  knotGroup.position.set(KNOT_X, KNOT_Y, 3);
   scene.add(knotGroup);
 
   // ---------- POST-PROCESSING PIPELINE (bloom + CA + vignette) ----------
@@ -1086,19 +1111,20 @@
     const ks = Math.max(0, 1 - Math.max(scrollProg * 2.6, morphSm * 2.2));
     knotGroup.visible = ks > .01;
     if (knotGroup.visible) {
-      knotGroup.scale.setScalar(ks);
+      knotGroup.scale.setScalar(ks * KNOT_S);
       knot.rotation.x = t * .35;
       knot.rotation.y = t * .5 + smx * .4;
-      knotGroup.position.y = Math.sin(t * .6) * .3;
+      knotGroup.position.y = KNOT_Y + Math.sin(t * .6) * .3;
       ring.rotation.z = t * .4;
       ring2.rotation.z = -t * .3;
     }
 
     // camera: intro fly-in, then scroll dive
-    let zoomBase = 26;
+    const CAM_END = IS_MOBILE ? 15.5 : 11;
+    let zoomBase = CAM_END + 15;
     if (introStart >= 0) {
       const e = Math.min(1, (t - introStart) / 2.4);
-      zoomBase = 26 - 15 * (1 - Math.pow(1 - e, 3));
+      zoomBase = (CAM_END + 15) - 15 * (1 - Math.pow(1 - e, 3));
     }
     camera.position.z = zoomBase - scrollProg * 2.5;
     camera.position.x = smx * .9;
