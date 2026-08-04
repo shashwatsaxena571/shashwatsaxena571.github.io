@@ -7,8 +7,21 @@
 <meta name="description" content="Data Engineer & PhD scholar in Explainable AI. I build streaming platforms, lakehouses and RAG pipelines that are transparent enough to bet real decisions on.">
 <meta property="og:title" content="Shashwat Saxena — Data Engineer & XAI Researcher">
 <meta property="og:description" content="Building pipelines people can trust. Streaming, lakehouses, RAG — and the research to make them explainable.">
-<meta property="og:image" content="og.png">
+<meta property="og:image" content="https://shashwatsaxena571.github.io/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://shashwatsaxena571.github.io/">
+<meta property="og:site_name" content="Shashwat Saxena">
 <meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@I_m_Shash">
+<meta name="twitter:creator" content="@I_m_Shash">
+<meta name="twitter:title" content="Shashwat Saxena — Data Engineer &amp; XAI Researcher">
+<meta name="twitter:description" content="Building pipelines people can trust. Streaming, lakehouses, RAG — and the research to make them explainable.">
+<meta name="twitter:image" content="https://shashwatsaxena571.github.io/og.png">
+<meta name="theme-color" content="#06060a">
+<meta name="author" content="Shashwat Saxena">
+<link rel="canonical" href="https://shashwatsaxena571.github.io/">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
 <script src="three.min.js"></script>
 <style>
@@ -141,11 +154,14 @@
   }
   body.loaded h1 .line:nth-child(1) > span { transform: translateY(0); transition-delay: .95s; }
   body.loaded h1 .line:nth-child(2) > span { transform: translateY(0); transition-delay: 1.1s; }
-  h1 .stroke { color: transparent; -webkit-text-stroke: 1.5px rgba(242,242,247,.55); }
+  h1 .stroke { color: rgba(242,242,247,.14); -webkit-text-stroke: 1.5px rgba(242,242,247,.82); }
   h1 .grad {
-    background: linear-gradient(100deg, #9d8fff, #5fe8d0);
+    background: linear-gradient(100deg, #b4a9ff, #7df0da);
     -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 3px 22px rgba(0,0,0,.9));
   }
+  h1 .line > span { text-shadow: 0 2px 34px rgba(4,4,10,.82), 0 0 90px rgba(4,4,10,.6); }
+  .hero p { text-shadow: 0 2px 22px rgba(4,4,10,.9); }
   .hero p {
     max-width: 560px; margin-top: 32px; color: var(--muted); font-size: 19px; line-height: 1.7;
     opacity: 0; transform: translateY(24px); transition: opacity 1s ease 1.35s, transform 1s ease 1.35s;
@@ -292,6 +308,52 @@
   .reveal { opacity: 0; transform: translateY(50px); transition: opacity .8s ease, transform .8s ease; }
   .reveal.visible { opacity: 1; transform: translateY(0); }
 
+  /* ===== Open source ===== */
+  .oss-lead { max-width: 640px; color: var(--muted); font-size: 17px; line-height: 1.7; margin-bottom: 44px; }
+  .repos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .repo {
+    display: block; text-decoration: none; color: inherit;
+    border: 1px solid var(--line); border-radius: 18px; padding: 26px 24px;
+    background: rgba(12,12,20,.8);
+    transition: border-color .3s, transform .3s, background .3s;
+  }
+  .repo:hover { border-color: var(--accent); transform: translateY(-4px); background: rgba(18,16,34,.9); }
+  .repo:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .repo-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .repo-name { font-weight: 700; font-size: 17px; letter-spacing: -.2px; }
+  .repo-go { color: var(--muted); transition: color .3s, transform .3s; }
+  .repo:hover .repo-go { color: var(--accent-2); transform: translate(3px, -3px); }
+  .repo p { color: var(--muted); font-size: 14.5px; line-height: 1.62; margin: 12px 0 16px; }
+  .repo .tags span {
+    display: inline-block; margin: 0 6px 6px 0; padding: 5px 11px; font-size: 11.5px;
+    border: 1px solid var(--line); border-radius: 100px; color: var(--muted); letter-spacing: .3px;
+  }
+  .oss-more { display: flex; gap: 26px; flex-wrap: wrap; margin-top: 38px; }
+  .oss-more a { color: var(--accent-2); text-decoration: none; font-size: 15px; font-weight: 600; }
+  .oss-more a:hover { text-decoration: underline; }
+
+  @keyframes navDrop {
+    from { opacity: .45; }
+    to   { opacity: 1; }
+  }
+
+  /* ===== Mobile nav ===== */
+  .nav-burger {
+    display: none; width: 44px; height: 44px; padding: 0; cursor: pointer;
+    border: 1px solid var(--line); border-radius: 13px; background: rgba(12,12,20,.7);
+    position: relative;
+  }
+  .nav-burger span {
+    position: absolute; left: 12px; width: 20px; height: 2px; border-radius: 2px;
+    background: var(--ink); transition: transform .32s cubic-bezier(.16,1,.3,1), opacity .2s;
+  }
+  .nav-burger span:nth-child(1) { top: 15px; }
+  .nav-burger span:nth-child(2) { top: 21px; }
+  .nav-burger span:nth-child(3) { top: 27px; }
+  .nav-burger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  .nav-burger.open span:nth-child(2) { opacity: 0; }
+  .nav-burger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
   .cta-wrap {
     text-align: center; padding: 170px 48px 150px; position: relative;
     background: radial-gradient(ellipse 760px 460px at 50% 42%, rgba(4,4,10,.72), transparent 72%);
@@ -353,10 +415,26 @@
     background: rgba(6,6,10,.7);
   }
 
+  @media (max-width: 1040px) { .repos { grid-template-columns: repeat(2, 1fr); } }
   @media (max-width: 860px) {
-    .nav-links { display: none; }
+    .nav-burger { display: block; }
+    /* Absolute (not fixed) so it tracks nav height automatically, and display-toggled
+       rather than transform-transitioned — this page's WebGL load can stall transitions. */
+    .nav-links {
+      display: none; flex-direction: column; gap: 0;
+      position: absolute; top: 100%; left: 0; right: 0;
+      background: rgba(8,8,14,.98);
+      border-bottom: 1px solid var(--line);
+      padding: 6px 0 16px; z-index: 90;
+    }
+    /* No transform/fill-mode here on purpose: if the compositor stalls under WebGL load,
+       a stalled animation must never leave the menu mispositioned or invisible. */
+    .nav-links.open { display: flex; animation: navDrop .26s ease-out; }
+    .nav-links a { padding: 15px 24px; font-size: 16px; border-bottom: 1px solid rgba(255,255,255,.055); }
     .stats { grid-template-columns: repeat(2, 1fr); }
     .cards { grid-template-columns: 1fr; }
+    .repos { grid-template-columns: 1fr; }
+    .oss-more { gap: 16px; }
     .watermark { display: none; }
   }
   @media (max-width: 700px) {
@@ -396,7 +474,7 @@
 
 <nav>
   <div class="logo">shashwat<span>.</span>dev</div>
-  <div class="nav-links">
+  <div class="nav-links" id="navLinks">
     <a href="#work">Work</a>
     <a href="#stats">Impact</a>
     <a href="#journey">Journey</a>
@@ -405,6 +483,7 @@
     <a href="#contact">Contact</a>
   </div>
   <a href="#contact" class="nav-cta magnetic">Let's talk</a>
+  <button class="nav-burger" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks"><span></span><span></span><span></span></button>
 </nav>
 
 <div class="stage-hint" id="stagehint">
@@ -453,21 +532,19 @@
   <div class="section-tag reveal">Selected work</div>
   <h2 class="reveal">Things I've built.</h2>
   <div class="cards">
-    <div class="card" data-href="https://www.linkedin.com/in/saxena-shashwat">
-      <div class="arrow">↗</div>
+    <div class="card">
       <div class="idx">01</div>
       <h3>Enterprise RAG for Financial Docs</h3>
       <p>A retrieval-augmented pipeline for financial document summarization — LangChain + vector databases wired into governed banking data flows, cutting manual review effort by 40%.</p>
       <div class="tags"><span>LangChain</span><span>Vector DBs</span><span>LLMOps</span></div>
     </div>
-    <div class="card" data-href="https://www.linkedin.com/in/saxena-shashwat">
-      <div class="arrow">↗</div>
+    <div class="card">
       <div class="idx">02</div>
       <h3>10x Lakehouse Migration</h3>
       <p>Moved RDBMS workloads to an Azure Databricks lakehouse — PySpark pipelines over 5M+ daily records running 10x faster, plus a 100GB+ Synapse warehouse consolidating 10+ vendor feeds.</p>
       <div class="tags"><span>Databricks</span><span>PySpark</span><span>Azure Synapse</span></div>
     </div>
-    <div class="card" data-href="https://github.com/shashwatsaxena571">
+    <div class="card" data-href="https://github.com/shashwatsaxena571/explainops">
       <div class="arrow">↗</div>
       <div class="idx">03</div>
       <h3>ExplainOps — Open Source</h3>
@@ -475,12 +552,54 @@
       <div class="tags"><span>XAI</span><span>Open Source</span><span>Python</span></div>
     </div>
     <div class="card">
-      <div class="arrow">↗</div>
       <div class="idx">04</div>
       <h3>Trustworthy AI Research</h3>
       <p>Survey of Trustworthy & Explainable AI accepted at IEEE WorldSUAS 2026 — alongside PhD research on making LLM systems transparent, bias-aware, and auditable in enterprise data platforms.</p>
       <div class="tags"><span>IEEE 2026</span><span>PhD</span><span>XAI</span></div>
     </div>
+  </div>
+</section>
+
+<section id="oss">
+  <div class="watermark">OPEN SOURCE</div>
+  <div class="section-tag reveal">Open source</div>
+  <h2 class="reveal">Shipping in public.</h2>
+  <p class="oss-lead reveal">One repo at a time, an XAI × Data Engineering stack — each with tests, CI and a runnable demo. Every claim below is something you can clone and check.</p>
+  <div class="repos reveal">
+    <a class="repo" href="https://github.com/shashwatsaxena571/explainops" target="_blank" rel="noopener">
+      <div class="repo-top"><span class="repo-name">ExplainOps</span><span class="repo-go">↗</span></div>
+      <p>Explainability as a pipeline stage — versioned, partitioned, queryable explanations.</p>
+      <div class="tags"><span>Python</span><span>XAI</span></div>
+    </a>
+    <a class="repo" href="https://github.com/shashwatsaxena571/lineage-explanation-tracer" target="_blank" rel="noopener">
+      <div class="repo-top"><span class="repo-name">Lineage Explanation Tracer</span><span class="repo-go">↗</span></div>
+      <p>Trace a wrong prediction back to the corrupt upstream table that caused it.</p>
+      <div class="tags"><span>Lineage</span><span>Debugging</span></div>
+    </a>
+    <a class="repo" href="https://github.com/shashwatsaxena571/explanation-drift-monitor" target="_blank" rel="noopener">
+      <div class="repo-top"><span class="repo-name">Explanation Drift Monitor</span><span class="repo-go">↗</span></div>
+      <p>Accuracy holds steady while the model's reasoning changes. Detect it without labels.</p>
+      <div class="tags"><span>Drift</span><span>Monitoring</span></div>
+    </a>
+    <a class="repo" href="https://github.com/shashwatsaxena571/trustbench" target="_blank" rel="noopener">
+      <div class="repo-top"><span class="repo-name">TrustBench</span><span class="repo-go">↗</span></div>
+      <p>One trust report card for any classifier — fairness, calibration, robustness.</p>
+      <div class="tags"><span>Fairness</span><span>EU AI Act</span></div>
+    </a>
+    <a class="repo" href="https://github.com/shashwatsaxena571/xai-disagreement-analyzer" target="_blank" rel="noopener">
+      <div class="repo-top"><span class="repo-name">XAI Disagreement Analyzer</span><span class="repo-go">↗</span></div>
+      <p>Do your feature-importance methods actually agree? Measure it, don't assume it.</p>
+      <div class="tags"><span>Attribution</span><span>Metrics</span></div>
+    </a>
+    <a class="repo" href="https://github.com/shashwatsaxena571/kafka-spark-streaming" target="_blank" rel="noopener">
+      <div class="repo-top"><span class="repo-name">Kafka → Spark → Delta</span><span class="repo-go">↗</span></div>
+      <p>Structured streaming with event-time windowing, watermarks and exactly-once sinks.</p>
+      <div class="tags"><span>Kafka</span><span>Spark</span></div>
+    </a>
+  </div>
+  <div class="oss-more reveal">
+    <a href="https://github.com/shashwatsaxena571" target="_blank" rel="noopener">All repositories on GitHub ↗</a>
+    <a href="https://www.kaggle.com/shashwatsaxena571" target="_blank" rel="noopener">Notebooks on Kaggle ↗</a>
   </div>
 </section>
 
@@ -493,7 +612,7 @@
       <div class="tdot"></div>
       <div class="twhen">Jul 2024 — Present · Pune</div>
       <h3>Data Engineer · IBM</h3>
-      <div class="role-note">Client: Barclays</div>
+      <div class="role-note">Client: a large banking client</div>
       <p>Optimized AWS Glue ETL to cut compute cost by 25%. Refactored PySpark jobs 25% faster, saving 200+ compute-hours a year. Built Kafka + PySpark streaming monitoring holding 99.9% uptime, and an enterprise RAG pipeline (LangChain + vector DBs) that cut manual review of financial documents by 40%.</p>
     </div>
     <div class="titem reveal">
@@ -518,8 +637,7 @@
   <div class="edu-row reveal">
     <span><b>AWS Certified</b> Data Engineer — Associate</span>
     <span><b>PCAP</b> — Certified Python Programmer</span>
-    <span><b>MCA</b> · VIT — 8.91/10</span>
-    <span><b>BCA</b> · MJP Rohilkhand University</span>
+    <span><b>MCA</b> · VIT</span>
   </div>
 </section>
 
@@ -556,6 +674,13 @@
       <p>Newsletter editions and engineering write-ups, republished for readers who live outside LinkedIn.</p>
       <div class="tags"><span>Essays</span><span>XAI</span><span>Data Eng</span></div>
     </div>
+    <div class="card" data-href="https://www.kaggle.com/shashwatsaxena571">
+      <div class="arrow">↗</div>
+      <div class="chan">KAGGLE</div>
+      <h3>Notebooks</h3>
+      <p>Reproducible XAI experiments — one question, one experiment, one honest finding each. Negative results included.</p>
+      <div class="tags"><span>Notebooks</span><span>XAI</span><span>Python</span></div>
+    </div>
     <div class="card" data-href="https://x.com/I_m_Shash">
       <div class="arrow">↗</div>
       <div class="idx">X</div>
@@ -590,6 +715,8 @@
     <a href="https://x.com/I_m_Shash" target="_blank" rel="noopener">X</a>
     <a href="https://www.youtube.com/@ByteSparkInsights" target="_blank" rel="noopener">YouTube</a>
     <a href="https://www.instagram.com/pipeline.diaries" target="_blank" rel="noopener">Instagram</a>
+    <a href="https://www.kaggle.com/shashwatsaxena571" target="_blank" rel="noopener">Kaggle</a>
+    <a href="https://medium.com/@shashwatsaxena115" target="_blank" rel="noopener">Medium</a>
     <a href="https://www.linkedin.com/newsletters/7488207829871304704/" target="_blank" rel="noopener">Newsletter</a>
   </div>
 </div>
@@ -1291,6 +1418,22 @@
       card.addEventListener('click', () => window.open(card.dataset.href, '_blank', 'noopener'));
     }
   });
+
+  // ---------- Mobile nav ----------
+  const burger = document.querySelector('.nav-burger');
+  const navLinksEl = document.getElementById('navLinks');
+  if (burger && navLinksEl) {
+    const setMenu = (open) => {
+      burger.classList.toggle('open', open);
+      navLinksEl.classList.toggle('open', open);
+      burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+      burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    };
+    burger.addEventListener('click', () => setMenu(!burger.classList.contains('open')));
+    navLinksEl.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setMenu(false)));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
+    addEventListener('resize', () => { if (innerWidth > 860) setMenu(false); });
+  }
 
   // ---------- Marquee ----------
   const mq = document.getElementById('marquee');
