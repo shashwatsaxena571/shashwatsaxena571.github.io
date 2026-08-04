@@ -308,6 +308,82 @@
   .reveal { opacity: 0; transform: translateY(50px); transition: opacity .8s ease, transform .8s ease; }
   .reveal.visible { opacity: 1; transform: translateY(0); }
 
+
+  /* ===== Writing & talks ===== */
+  /* Solid scrim (not backdrop-filter — that caused frame stutter) so rows stay
+     readable where the particle field is dense. */
+  .pubs { border-top: 1px solid var(--line); background: rgba(9,9,16,.82); border-radius: 18px; padding: 2px 20px; }
+  .pub {
+    display: grid; grid-template-columns: 210px 1fr auto; gap: 26px; align-items: baseline;
+    padding: 26px 4px; border-bottom: 1px solid var(--line);
+    text-decoration: none; color: inherit; transition: background .28s, padding-left .28s;
+  }
+  .pub:not(.pub-static):hover { background: rgba(124,108,255,.05); padding-left: 14px; }
+  .pub:focus-visible { outline: 2px solid var(--accent-2); outline-offset: -2px; }
+  .pub-meta { display: flex; flex-direction: column; gap: 4px; }
+  .pub-date { color: var(--accent-2); font-size: 12px; letter-spacing: 1.6px; text-transform: uppercase; }
+  .pub-venue { color: var(--muted); font-size: 13px; }
+  .pub-main h3 { font-size: 19px; letter-spacing: -.3px; margin-bottom: 6px; font-weight: 700; }
+  .pub-main p { color: var(--muted); font-size: 14.5px; line-height: 1.6; }
+  .pub-go { color: var(--muted); font-size: 15px; transition: color .28s; }
+  .pub:hover .pub-go { color: var(--accent-2); }
+  .pub-kind {
+    padding: 5px 12px; border: 1px solid var(--line); border-radius: 100px;
+    font-size: 11.5px; color: var(--muted); letter-spacing: .6px; white-space: nowrap;
+  }
+  @media (max-width: 860px) {
+    .pub { grid-template-columns: 1fr; gap: 10px; padding: 22px 4px; }
+    .pub-meta { flex-direction: row; gap: 12px; align-items: center; }
+    .pub-kind { justify-self: start; }
+  }
+
+  /* ===== Case-study modal (display-toggled: transitions can stall under WebGL load) ===== */
+  .study-overlay {
+    position: fixed; inset: 0; z-index: 200; display: flex;
+    align-items: center; justify-content: center; padding: 28px;
+    background: rgba(3,3,8,.86); backdrop-filter: blur(6px);
+    animation: studyIn .2s ease-out;
+  }
+  .study-overlay[hidden] { display: none; }
+  @keyframes studyIn { from { opacity: .3 } to { opacity: 1 } }
+  .study {
+    position: relative; width: min(760px, 100%); max-height: 86vh; overflow-y: auto;
+    background: #0c0c14; border: 1px solid var(--line); border-radius: 24px;
+    padding: 46px 46px 40px;
+  }
+  .study-x {
+    position: absolute; top: 18px; right: 18px; width: 40px; height: 40px;
+    border: 1px solid var(--line); border-radius: 50%; background: transparent;
+    color: var(--muted); font-size: 24px; line-height: 1; cursor: pointer;
+  }
+  .study-x:hover { color: var(--ink); border-color: var(--accent); }
+  .study-kicker { color: var(--accent-2); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; }
+  .study h3 { font-size: 30px; letter-spacing: -.6px; margin: 12px 0 26px; }
+  .study-body h4 {
+    font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--muted); margin: 24px 0 8px;
+  }
+  .study-body p { color: var(--ink); opacity: .88; font-size: 16px; line-height: 1.72; }
+  .study-body ul { margin: 6px 0 0; padding-left: 18px; }
+  .study-body li { color: var(--ink); opacity: .88; font-size: 15.5px; line-height: 1.72; margin-bottom: 6px; }
+  .study-metrics { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; }
+  .study-metrics span {
+    padding: 9px 15px; border: 1px solid var(--line); border-radius: 12px;
+    font-size: 14px; color: var(--accent-2); font-weight: 600;
+  }
+  .study-link { display: inline-block; margin-top: 26px; color: var(--accent-2); font-weight: 600; }
+  @media (max-width: 700px) { .study { padding: 40px 24px 30px; } .study h3 { font-size: 24px; } }
+
+  /* ===== Focus + skip link ===== */
+  .skip-link {
+    position: absolute; left: -9999px; top: 0; z-index: 300;
+    background: var(--ink); color: #0a0a12; padding: 12px 20px; border-radius: 0 0 10px 0; font-weight: 700;
+  }
+  .skip-link:focus { left: 0; }
+  a:focus-visible, button:focus-visible, [role="button"]:focus-visible, .card:focus-visible {
+    outline: 2px solid var(--accent-2); outline-offset: 3px; border-radius: 6px;
+  }
+
   /* ===== Open source ===== */
   .oss-lead { max-width: 640px; color: var(--muted); font-size: 17px; line-height: 1.7; margin-bottom: 44px; }
   .repos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
@@ -458,6 +534,30 @@
     .card { padding: 30px 24px; }
   }
 </style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Shashwat Saxena",
+  "url": "https://shashwatsaxena571.github.io/",
+  "jobTitle": "Data Engineer",
+  "email": "mailto:shashwatsaxena171@gmail.com",
+  "address": { "@type": "PostalAddress", "addressLocality": "Pune", "addressCountry": "IN" },
+  "worksFor": { "@type": "Organization", "name": "IBM" },
+  "alumniOf": { "@type": "CollegeOrUniversity", "name": "VIT" },
+  "knowsAbout": ["Data Engineering", "Explainable AI", "Apache Spark", "Apache Kafka",
+                 "Databricks", "Trustworthy AI", "Retrieval-Augmented Generation"],
+  "sameAs": [
+    "https://www.linkedin.com/in/saxena-shashwat",
+    "https://github.com/shashwatsaxena571",
+    "https://x.com/I_m_Shash",
+    "https://www.kaggle.com/shashwatsaxena571",
+    "https://medium.com/@shashwatsaxena115",
+    "https://www.youtube.com/@ByteSparkInsights",
+    "https://www.instagram.com/pipeline.diaries"
+  ]
+}
+</script>
 </head>
 <body>
 
@@ -472,12 +572,22 @@
 <div class="cursor-ring" id="cring"></div>
 <div class="cursor-dot" id="cdot"></div>
 
+<a class="skip-link" href="#work">Skip to content</a>
+<div class="study-overlay" id="studyOverlay" hidden>
+  <div class="study" role="dialog" aria-modal="true" aria-labelledby="studyTitle">
+    <button class="study-x" id="studyClose" aria-label="Close case study">&times;</button>
+    <div class="study-kicker" id="studyKicker"></div>
+    <h3 id="studyTitle"></h3>
+    <div class="study-body" id="studyBody"></div>
+  </div>
+</div>
 <nav>
   <div class="logo">shashwat<span>.</span>dev</div>
   <div class="nav-links" id="navLinks">
     <a href="#work">Work</a>
     <a href="#stats">Impact</a>
     <a href="#journey">Journey</a>
+    <a href="#writing">Writing</a>
     <a href="#channels">Content</a>
     <a href="Shashwat_Saxena_Resume.pdf" download>Resume</a>
     <a href="#contact">Contact</a>
@@ -532,26 +642,29 @@
   <div class="section-tag reveal">Selected work</div>
   <h2 class="reveal">Things I've built.</h2>
   <div class="cards">
-    <div class="card">
+    <div class="card" data-study="01" tabindex="0" role="button" aria-haspopup="dialog">
+      <div class="arrow">↗</div>
       <div class="idx">01</div>
       <h3>Enterprise RAG for Financial Docs</h3>
       <p>A retrieval-augmented pipeline for financial document summarization — LangChain + vector databases wired into governed banking data flows, cutting manual review effort by 40%.</p>
       <div class="tags"><span>LangChain</span><span>Vector DBs</span><span>LLMOps</span></div>
     </div>
-    <div class="card">
+    <div class="card" data-study="02" tabindex="0" role="button" aria-haspopup="dialog">
+      <div class="arrow">↗</div>
       <div class="idx">02</div>
       <h3>10x Lakehouse Migration</h3>
       <p>Moved RDBMS workloads to an Azure Databricks lakehouse — PySpark pipelines over 5M+ daily records running 10x faster, plus a 100GB+ Synapse warehouse consolidating 10+ vendor feeds.</p>
       <div class="tags"><span>Databricks</span><span>PySpark</span><span>Azure Synapse</span></div>
     </div>
-    <div class="card" data-href="https://github.com/shashwatsaxena571/explainops">
+    <div class="card" data-study="03" tabindex="0" role="button" aria-haspopup="dialog">
       <div class="arrow">↗</div>
       <div class="idx">03</div>
       <h3>ExplainOps — Open Source</h3>
       <p>An ops layer for ML explanations: lineage-linked attribution tracing, drift monitoring, and trust checks. Part of an XAI × Data Engineering series I'm shipping repo by repo on GitHub.</p>
       <div class="tags"><span>XAI</span><span>Open Source</span><span>Python</span></div>
     </div>
-    <div class="card">
+    <div class="card" data-study="04" tabindex="0" role="button" aria-haspopup="dialog">
+      <div class="arrow">↗</div>
       <div class="idx">04</div>
       <h3>Trustworthy AI Research</h3>
       <p>Survey of Trustworthy & Explainable AI accepted at IEEE WorldSUAS 2026 — alongside PhD research on making LLM systems transparent, bias-aware, and auditable in enterprise data platforms.</p>
@@ -600,6 +713,19 @@
   <div class="oss-more reveal">
     <a href="https://github.com/shashwatsaxena571" target="_blank" rel="noopener">All repositories on GitHub ↗</a>
     <a href="https://www.kaggle.com/shashwatsaxena571" target="_blank" rel="noopener">Notebooks on Kaggle ↗</a>
+  </div>
+</section>
+
+<section id="writing">
+  <div class="watermark">WRITING</div>
+  <div class="section-tag reveal">Writing &amp; talks</div>
+  <h2 class="reveal">Thinking out loud.</h2>
+  <p class="oss-lead reveal">Research, long-form and a Hinglish SQL series — the same ideas, pitched at whoever needs them.</p>
+  <div class="pubs reveal">
+    <div class="pub pub-static"><div class="pub-meta"><span class="pub-date">Sept 2026</span><span class="pub-venue">IEEE WorldSUAS 2026 · Indore</span></div><div class="pub-main"><h3>A Survey of Trustworthy &amp; Explainable AI</h3><p>Accepted for presentation, 4–5 September 2026.</p></div><span class="pub-kind">Paper</span></div>
+    <a class="pub" href="https://www.linkedin.com/newsletters/7488207829871304704/" target="_blank" rel="noopener"><div class="pub-meta"><span class="pub-date">2026</span><span class="pub-venue">Explainable Pipelines · Newsletter</span></div><div class="pub-main"><h3>Your AI Can&rsquo;t Explain Itself. Your Pipeline Is Why. <span class="pub-go">↗</span></h3><p>Edition #1 — why explanation failures are usually data-layer failures.</p></div><span class="pub-kind">Newsletter</span></a>
+    <a class="pub" href="https://www.kaggle.com/code/shashwatsaxena571/do-your-feature-importances-agree-the-xai-disagree" target="_blank" rel="noopener"><div class="pub-meta"><span class="pub-date">2026</span><span class="pub-venue">Kaggle · Notebook</span></div><div class="pub-main"><h3>Do Your Feature Importances Agree? <span class="pub-go">↗</span></h3><p>Five attribution methods on one model — and an honest negative result.</p></div><span class="pub-kind">Notebook</span></a>
+    <a class="pub" href="https://youtu.be/duFCZ2saNkI" target="_blank" rel="noopener"><div class="pub-meta"><span class="pub-date">2026</span><span class="pub-venue">Bits to Insights · YouTube</span></div><div class="pub-main"><h3>Database kya hai aur Excel kyun kaafi nahi? <span class="pub-go">↗</span></h3><p>SQL Zero to Interview #01 — a Hinglish series for working data engineers.</p></div><span class="pub-kind">Video</span></a>
   </div>
 </section>
 
@@ -735,6 +861,8 @@
   // =====================================================================
   const canvas = document.getElementById('gl');
   const IS_MOBILE = innerWidth < 700 || matchMedia('(pointer: coarse)').matches;
+  // Respect the OS reduced-motion setting: fewer particles, no scroll skew.
+  const REDUCED_MOTION = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: !IS_MOBILE });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
   renderer.setSize(innerWidth, innerHeight);
@@ -810,7 +938,7 @@
   const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, .1, 100);
   camera.position.z = 26;
 
-  const COUNT = IS_MOBILE ? 9000 : 20000;
+  const COUNT = REDUCED_MOTION ? 4000 : (IS_MOBILE ? 9000 : 20000);
   function galaxyTargets() {
     const a = new Float32Array(COUNT*3);
     for (let i = 0; i < COUNT; i++) {
@@ -1218,7 +1346,7 @@
       vel = targetY - cur;
       cur += vel * .12;
       if (Math.abs(targetY - cur) < .1) cur = targetY;
-      const skew = Math.max(-3.5, Math.min(3.5, vel * .01));
+      const skew = REDUCED_MOTION ? 0 : Math.max(-3.5, Math.min(3.5, vel * .01));
       content.style.transform = `translate3d(0, ${-cur}px, 0) skewY(${skew}deg)`;
     } else {
       cur = targetY;
@@ -1419,6 +1547,118 @@
     }
   });
 
+
+  // ---------- Case studies ----------
+  const STUDIES = {
+    '01': {
+      kicker: 'IBM · 2024 — present · Pune',
+      title: 'Enterprise RAG for Financial Documents',
+      html: `
+        <h4>The problem</h4>
+        <p>Analysts at a large banking client were reading long financial documents by hand before a decision could move. The bottleneck was not the model — it was that nothing could retrieve the right passage under the same access controls the warehouse already enforced.</p>
+        <h4>What I built</h4>
+        <p>A retrieval-augmented pipeline using LangChain and vector databases, wired directly into governed banking data flows so retrieval inherits the warehouse's access model rather than bypassing it.</p>
+        <h4>Outcome</h4>
+        <div class="study-metrics"><span>40% less manual review</span></div>
+        <h4>Alongside it, on the same platform</h4>
+        <ul>
+          <li>AWS Glue ETL tuned for <b>25% lower compute cost</b></li>
+          <li>PySpark refactors <b>25% faster</b>, saving <b>200+ compute-hours a year</b></li>
+          <li>Kafka + PySpark streaming monitoring holding <b>99.9% uptime</b></li>
+        </ul>
+        <h4>Stack</h4>
+        <p>LangChain · Vector databases · PySpark · Kafka · AWS Glue</p>`
+    },
+    '02': {
+      kicker: 'Pine Labs · 2021 — 2024',
+      title: '10x Lakehouse Migration',
+      html: `
+        <h4>The problem</h4>
+        <p>RDBMS workloads could not keep pace with daily volume, and reporting depended on more than ten separate vendor feeds that had never been consolidated.</p>
+        <h4>What I built</h4>
+        <p>Migrated the workloads to Azure Data Lake and Databricks, rewrote the transformation layer in PySpark, and consolidated the vendor feeds into a single Synapse warehouse. Added real-time Spark Streaming and Kafka pipelines on top.</p>
+        <h4>Outcome</h4>
+        <div class="study-metrics">
+          <span>10x faster pipelines</span><span>5M+ records daily</span>
+          <span>100GB+ warehouse</span><span>15+ pipelines in production</span>
+        </div>
+        <h4>Stack</h4>
+        <p>Azure Databricks · PySpark · Azure Synapse · Kafka · Spark Streaming · Delta Lake</p>`
+    },
+    '03': {
+      kicker: 'Open source · ongoing',
+      title: 'ExplainOps — explainability as a pipeline stage',
+      html: `
+        <h4>The idea</h4>
+        <p>Model explanations are usually produced in a notebook and thrown away. If a decision has to be defended six months later, that is too late. ExplainOps treats explanation as a pipeline stage — versioned, partitioned and queryable like any other table.</p>
+        <h4>The series it belongs to</h4>
+        <ul>
+          <li><b>Lineage Explanation Tracer</b> — trace a wrong prediction to the corrupt upstream table</li>
+          <li><b>Explanation Drift Monitor</b> — accuracy holds while the reasoning shifts; catch it without labels</li>
+          <li><b>TrustBench</b> — one trust report card: fairness, calibration, robustness</li>
+          <li><b>XAI Disagreement Analyzer</b> — do your attribution methods actually agree?</li>
+        </ul>
+        <h4>How they're built</h4>
+        <p>Every repo ships with tests, CI and a runnable demo. Nothing in a README is asserted that the demo does not compute.</p>
+        <a class="study-link" href="https://github.com/shashwatsaxena571/explainops" target="_blank" rel="noopener">View ExplainOps on GitHub ↗</a>`
+    },
+    '04': {
+      kicker: 'Research · PhD at VIT, expected 2029',
+      title: 'Trustworthy &amp; Explainable AI',
+      html: `
+        <h4>The work</h4>
+        <p>A survey of trustworthy and explainable AI, accepted at <b>IEEE WorldSUAS 2026</b>, alongside PhD research on making LLM-era systems transparent, bias-aware and auditable inside enterprise data platforms.</p>
+        <h4>What the survey collects</h4>
+        <ul>
+          <li>Attribution methods disagree with each other far more than practitioners expect — rank agreement as low as <b>0.19</b> across methods, with around <b>84%</b> of practitioners reporting they have hit the disagreement problem</li>
+          <li>Chain-of-thought explanations can be unfaithful to the computation they describe — up to a <b>36% accuracy shift</b> under intervention</li>
+          <li>Attention weights are not explanations (Jain &amp; Wallace)</li>
+        </ul>
+        <h4>Where it goes next</h4>
+        <p>Label-free detection of explanation drift: catching the moment a model's reasoning changes even while its accuracy looks stable.</p>`
+    }
+  };
+
+  const overlay = document.getElementById('studyOverlay');
+  const studyClose = document.getElementById('studyClose');
+  let lastFocused = null;
+
+  function openStudy(key) {
+    const st = STUDIES[key];
+    if (!st) return;
+    lastFocused = document.activeElement;
+    document.getElementById('studyKicker').textContent = st.kicker;
+    document.getElementById('studyTitle').innerHTML = st.title;
+    document.getElementById('studyBody').innerHTML = st.html;
+    overlay.hidden = false;
+    document.body.style.overflow = 'hidden';
+    studyClose.focus();
+  }
+  function closeStudy() {
+    overlay.hidden = true;
+    document.body.style.overflow = '';
+    if (lastFocused) lastFocused.focus();
+  }
+  studyClose.addEventListener('click', closeStudy);
+  overlay.addEventListener('mousedown', e => { if (e.target === overlay) closeStudy(); });
+  document.addEventListener('keydown', e => {
+    if (overlay.hidden) return;
+    if (e.key === 'Escape') { closeStudy(); return; }
+    if (e.key === 'Tab') {
+      const f = overlay.querySelectorAll('button, a[href]');
+      if (!f.length) return;
+      const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  });
+  document.querySelectorAll('[data-study]').forEach(c => {
+    c.addEventListener('click', () => openStudy(c.dataset.study));
+    c.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openStudy(c.dataset.study); }
+    });
+  });
+
   // ---------- Mobile nav ----------
   const burger = document.querySelector('.nav-burger');
   const navLinksEl = document.getElementById('navLinks');
@@ -1468,5 +1708,6 @@
     morphSm = Math.min(1, sy / dm) * 3;
   }
 </script>
+
 </body>
 </html>
